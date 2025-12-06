@@ -1,0 +1,6 @@
+.bg-login-image {
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
