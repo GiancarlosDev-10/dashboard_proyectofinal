@@ -43,8 +43,8 @@ if (!isset($activePage)) $activePage = '';
         <div id="collapseAlumnos" class="collapse" aria-labelledby="headingAlumnos" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Nueva Acción</h6>
-                <a class="collapse-item" href="/admin_php/actions/alumnos/addalumno.php">Agregar Alumno</a>
-                <a class="collapse-item" href="/admin_php/actions/alumnos/deletealumno.php">Eliminar Alumno</a>
+                <a class="collapse-item" href="/admin_php/actions/alumnos/indexalumno.php">Ver Alumnos</a>
+                <a class="collapse-item" href="/admin_php/actions/alumnos/reportalumno.php">Reporte General</a>
             </div>
         </div>
     </li>
