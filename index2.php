@@ -50,11 +50,42 @@ ini_set('display_errors', 1);
                 label: 'Ganancias por Mes',
                 data: <?= json_encode($montos) ?>,
                 borderColor: '#4e73df',
-                backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                backgroundColor: 'rgba(78,115,223,0.05)',
                 fill: true
             }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 1000, // límite inferior
+                        max: 5000, // límite superior
+                        stepSize: 500, // intervalo entre marcas
+                        callback: function(value) {
+                            return "S/. " + value.toLocaleString(); // formato profesional
+                        }
+                    },
+                    gridLines: {
+                        drawTicks: true,
+                        tickMarkLength: 8,
+                        color: "rgba(0, 0, 0, 0.05)",
+                        zeroLineColor: "rgba(0, 0, 0, 0.1)",
+                        drawBorder: false // 🔥 quita la línea dura del borde
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            },
+            legend: {
+                display: true
+            }
         }
     });
+
+
 
     /* === PIE CHART === */
     var ctxPie = document.getElementById('myPieChart').getContext('2d');

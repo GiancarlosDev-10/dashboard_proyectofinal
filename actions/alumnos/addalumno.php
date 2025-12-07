@@ -1,9 +1,6 @@
 <?php
 include("../../db.php");
 
-file_put_contents("debug_add.txt", "DATA RECIBIDA: " . json_encode($_POST) . "\n", FILE_APPEND);
-
-
 $errores = [];
 
 $nombre = trim($_POST['nombre'] ?? '');

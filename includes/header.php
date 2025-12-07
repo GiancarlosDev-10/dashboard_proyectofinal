@@ -15,4 +15,3 @@ if (!isset($pageTitle)) $pageTitle = 'Panel';
 </head>
 
 <body id="page-top">
-    <div id="wrapper">
