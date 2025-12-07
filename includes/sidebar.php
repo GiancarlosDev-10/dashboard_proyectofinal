@@ -52,14 +52,14 @@ if (!isset($activePage)) $activePage = '';
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDocente"
             aria-expanded="true" aria-controls="collapseDocente">
             <i class="fas fa-chalkboard-teacher"></i>
-            <span>Docente</span>
+            <span>Cursos</span>
         </a>
         <div id="collapseDocente" class="collapse" aria-labelledby="headingDocente"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Nueva Acción</h6>
-                <a class="collapse-item" href="/admin_php/actions/docentes/adddocente.php">Agregar Docente</a>
-                <a class="collapse-item" href="/admin_php/actions/docentes/deletedocente.php">Eliminar Docente</a>
+                <a class="collapse-item" href="/admin_php/actions/cursos/indexcursos.php">Ver Cursos</a>
+                <a class="collapse-item" href="/admin_php/actions/cursos/reportecursos.php">Reporte General</a>
             </div>
         </div>
     </li>
@@ -67,14 +67,14 @@ if (!isset($activePage)) $activePage = '';
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCursos"
             aria-expanded="true" aria-controls="collapseCursos">
             <i class="fas fa-book"></i>
-            <span>Cursos</span>
+            <span>Docentes</span>
         </a>
         <div id="collapseCursos" class="collapse" aria-labelledby="headingCursos"
             data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Nueva Acción</h6>
-                <a class="collapse-item" href="/admin_php/actions/cursos/addcursos.php">Agregar Curso</a>
-                <a class="collapse-item" href="/admin_php/actions/cursos/deletecurso.php">Eliminar Curso</a>
+                <a class="collapse-item" href="/admin_php/actions/docentes/indexdocentes.php">Ver Docentes</a>
+                <a class="collapse-item" href="/admin_php/actions/docentes/reportedocentes.php">Reporte General</a>
             </div>
         </div>
     </li>
