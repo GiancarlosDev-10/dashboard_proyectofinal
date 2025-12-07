@@ -9,9 +9,8 @@ if (!isset($pageTitle)) $pageTitle = 'Panel';
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title><?= htmlspecialchars($pageTitle) ?> - Mi Admin</title>
 
-    <!-- CSS – rutas absolutas -->
+    <!-- CSS correctos (SB-Admin 2 no usa bootstrap.min.css separado) -->
     <link href="/admin_php/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="/admin_php/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/admin_php/css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 

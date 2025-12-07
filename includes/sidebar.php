@@ -8,7 +8,7 @@ if (!isset($activePage)) $activePage = '';
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index2.php">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin_php/index2.php">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
@@ -75,6 +75,21 @@ if (!isset($activePage)) $activePage = '';
                 <h6 class="collapse-header">Nueva Acción</h6>
                 <a class="collapse-item" href="/admin_php/actions/docentes/indexdocentes.php">Ver Docentes</a>
                 <a class="collapse-item" href="/admin_php/actions/docentes/reportedocentes.php">Reporte General</a>
+            </div>
+        </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMatriculas"
+            aria-expanded="true" aria-controls="collapseMatriculas">
+            <i class="fas fa-address-card"></i>
+            <span>Matrículas</span>
+        </a>
+        <div id="collapseMatriculas" class="collapse" aria-labelledby="headingMatriculas"
+            data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Nueva Acción</h6>
+                <a class="collapse-item" href="/admin_php/actions/matriculas/indexmatriculas.php">Ver Matrículas</a>
+                <a class="collapse-item" href="/admin_php/actions/matriculas/reportematriculas.php">Reporte General</a>
             </div>
         </div>
     </li>
