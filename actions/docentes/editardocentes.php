@@ -16,7 +16,6 @@ if (!empty($_POST['id'])) {
     if ($dni === '' || !ctype_digit($dni))
         $errores[] = "El DNI debe contener solo números.";
 
-    // SI TODO ESTÁ CORRECTO → UPDATE
     if (empty($errores)) {
 
         $sql = "UPDATE docente SET 
@@ -29,16 +28,15 @@ if (!empty($_POST['id'])) {
         $stmt->bind_param("sssi", $nombre, $especialidad, $dni, $id);
         $stmt->execute();
 
-        header("Location: indexdocentes.php?edit=ok");
+        header("Location: /admin_php/actions/docentes/indexdocentes.php?edit=ok");
         exit;
     } else {
 
-        // ENVIAR ERRORES AL MODAL
         $params = http_build_query([
             'error' => implode('|', $errores)
         ]);
 
-        header("Location: indexdocentes.php?$params#editModal");
+        header("Location: /admin_php/actions/docentes/indexdocentes.php?$params#editModal");
         exit;
     }
 }

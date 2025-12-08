@@ -3,53 +3,38 @@ include("../../db.php");
 
 $errores = [];
 
-if (!empty($_POST['id'])) {
+$id                = trim($_POST['id'] ?? '');
+$curso_id          = trim($_POST['curso_id'] ?? '');
+$fecha_inscripcion = trim($_POST['fecha_inscripcion'] ?? '');
+$estado            = trim($_POST['estado'] ?? '');
 
-    $id               = intval(trim($_POST['id']));
-    $curso_id         = trim($_POST['curso_id'] ?? '');
-    $estado           = trim($_POST['estado'] ?? '');
+if ($id === '' || !ctype_digit($id))
+    $errores[] = "ID inválido.";
 
-    // Estos NO se modifican
-    // $alumno_id (bloqueado en modal)
-    // $fecha_inscripcion (solo lectura)
+if ($curso_id === '' || !ctype_digit($curso_id))
+    $errores[] = "Debe seleccionar un curso.";
 
-    // Validaciones
-    if ($curso_id === '' || !is_numeric($curso_id)) {
-        $errores[] = "Debe seleccionar un curso.";
-    }
+if ($fecha_inscripcion === '')
+    $errores[] = "Debe seleccionar la fecha de inscripción.";
 
-    if ($estado === '') {
-        $errores[] = "Debe seleccionar un estado.";
-    }
+if ($estado === '')
+    $errores[] = "Debe seleccionar un estado.";
 
-    // SI TODO ESTÁ CORRECTO → UPDATE
-    if (empty($errores)) {
+if (empty($errores)) {
 
-        $sql = "UPDATE matricula SET 
-                    curso_id = ?, 
-                    estado = ?
-                WHERE id = ?";
+    $sql = "UPDATE matricula
+            SET curso_id = ?, fecha_inscripcion = ?, estado = ?
+            WHERE id = ?";
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param(
-            "isi",
-            $curso_id,
-            $estado,
-            $id
-        );
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("issi", $curso_id, $fecha_inscripcion, $estado, $id);
+    $stmt->execute();
 
-        $stmt->execute();
+    header("Location: indexmatriculas.php?edit=ok");
+    exit;
+} else {
 
-        header("Location: indexmatriculas.php?edit=ok");
-        exit;
-    } else {
-
-        // Enviar errores al modal
-        $params = http_build_query([
-            'error' => implode('|', $errores)
-        ]);
-
-        header("Location: indexmatriculas.php?$params#editModal");
-        exit;
-    }
+    $params = http_build_query(['error' => implode('|', $errores)]);
+    header("Location: indexmatriculas.php?$params#editModal");
+    exit;
 }

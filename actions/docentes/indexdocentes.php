@@ -1,6 +1,6 @@
 <?php include(__DIR__ . '/../../includes/header.php'); ?>
 
-<div id="wrapper"> <!-- 🔥 ABRIR WRAPPER -->
+<div id="wrapper">
 
     <?php include(__DIR__ . '/../../includes/sidebar.php'); ?>
 
@@ -11,7 +11,14 @@
 
             <div class="container mt-4">
 
-                <h3 class="text-primary mb-3">Lista de Docentes</h3>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="text-primary mb-0">Lista de Docentes</h3>
+
+                    <!-- BOTÓN AGREGAR -->
+                    <button class="btn btn-success" data-toggle="modal" data-target="#addModal">
+                        <i class="fa fa-plus"></i> Agregar Docente
+                    </button>
+                </div>
 
                 <?php
                 include("../../db.php");
@@ -37,6 +44,7 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
@@ -45,6 +53,8 @@
                                 <td><?= $row['especialidad'] ?></td>
                                 <td><?= $row['dni'] ?></td>
                                 <td>
+
+                                    <!-- BOTÓN EDITAR -->
                                     <button class="btn btn-warning btn-sm"
                                         data-toggle="modal"
                                         data-target="#editModal"
@@ -55,17 +65,20 @@
                                         Editar
                                     </button>
 
-                                    <a href="deletedocente.php?id=<?= $row['id'] ?>"
+                                    <!-- BOTÓN ELIMINAR -->
+                                    <a href="deletedocentes.php?id=<?= $row['id'] ?>"
                                         class="btn btn-danger btn-sm"
                                         onclick="return confirm('¿Seguro que desea eliminar?');">
                                         Eliminar
                                     </a>
+
                                 </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
 
+                <!-- PAGINACIÓN -->
                 <?php if ($paginas > 1): ?>
                     <nav>
                         <ul class="pagination justify-content-center">
@@ -82,14 +95,111 @@
         </div>
     </div>
 
-</div> <!-- 🔥 CERRAR WRAPPER -->
+</div> <!-- WRAPPER -->
 
-<script src="../../vendor/jquery/jquery.min.js"></script>
-<script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- ========================================================= -->
+<!-- MODAL EDITAR DOCENTE -->
+<!-- ========================================================= -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <form action="editardocentes.php" method="POST">
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Editar Docente</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="id" id="edit-id">
+
+                    <div class="mb-3">
+                        <label>Nombre</label>
+                        <input type="text" name="nombre" id="edit-nombre" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Especialidad</label>
+                        <input type="text" name="especialidad" id="edit-especialidad" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>DNI</label>
+                        <input type="text" name="dni" id="edit-dni" class="form-control" required>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL AGREGAR DOCENTE -->
+<!-- ========================================================= -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <form action="adddocentes.php" method="POST">
+
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title text-white">Agregar Docente</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label>Nombre</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Especialidad</label>
+                        <input type="text" name="especialidad" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>DNI</label>
+                        <input type="text" name="dni" class="form-control" required>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" type="submit">Registrar docente</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- SCRIPTS -->
+<!-- ========================================================= -->
+<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
+<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $('#editModal').on('show.bs.modal', function(event) {
         let b = $(event.relatedTarget);
+
         $('#edit-id').val(b.data('id'));
         $('#edit-nombre').val(b.data('nombre'));
         $('#edit-especialidad').val(b.data('especialidad'));

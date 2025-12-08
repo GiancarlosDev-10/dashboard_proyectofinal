@@ -1,54 +1,42 @@
 <?php
 include("../../db.php");
 
-$errores = [];
-
-// Recibir datos
-$alumno_id        = trim($_POST['alumno_id'] ?? '');
-$curso_id         = trim($_POST['curso_id'] ?? '');
-$estado           = trim($_POST['estado'] ?? '');
+$alumno_id         = trim($_POST['alumno_id'] ?? '');
+$curso_id          = trim($_POST['curso_id'] ?? '');
 $fecha_inscripcion = trim($_POST['fecha_inscripcion'] ?? '');
+$estado            = trim($_POST['estado'] ?? 'Matriculado');
 
 // VALIDACIONES
-if ($alumno_id === '' || !is_numeric($alumno_id))
+$errores = [];
+
+if ($alumno_id === '' || !ctype_digit($alumno_id))
     $errores[] = "Debe seleccionar un alumno.";
 
-if ($curso_id === '' || !is_numeric($curso_id))
+if ($curso_id === '' || !ctype_digit($curso_id))
     $errores[] = "Debe seleccionar un curso.";
 
-if ($estado === '')
-    $errores[] = "Debe seleccionar un estado.";
-
 if ($fecha_inscripcion === '')
-    $errores[] = "Debe ingresar la fecha de inscripción.";
+    $errores[] = "La fecha de inscripción es obligatoria.";
 
+if ($estado === '')
+    $errores[] = "Debe seleccionar un estado válido.";
 
-// SI NO HAY ERRORES → INSERTAR
+// SI NO HAY ERRORES
 if (empty($errores)) {
 
-    $sql = "INSERT INTO matricula (alumno_id, curso_id, estado, fecha_inscripcion) 
+    $sql = "INSERT INTO matricula 
+            (alumno_id, curso_id, fecha_inscripcion, estado)
             VALUES (?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param(
-        "iiss",
-        $alumno_id,
-        $curso_id,
-        $estado,
-        $fecha_inscripcion
-    );
-
+    $stmt->bind_param("iiss", $alumno_id, $curso_id, $fecha_inscripcion, $estado);
     $stmt->execute();
 
     header("Location: indexmatriculas.php?add=ok");
     exit;
 } else {
 
-    // Enviar errores al modal
-    $params = http_build_query([
-        'error' => implode('|', $errores)
-    ]);
-
+    $params = http_build_query(['error' => implode('|', $errores)]);
     header("Location: indexmatriculas.php?$params#addModal");
     exit;
 }
