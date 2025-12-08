@@ -38,6 +38,12 @@ ini_set('display_errors', 1);
 <!-- FIN WRAPPER -->
 
 <!-- CHARTS JS -->
+<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
+<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- CHART.JS (🔥 obligatorio para que dibuje los gráficos) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 <script>
     /* === AREA CHART === */
     var ctxArea = document.getElementById('myAreaChart').getContext('2d');

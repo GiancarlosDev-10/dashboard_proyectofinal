@@ -44,7 +44,7 @@ if (!isset($activePage)) $activePage = '';
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Nueva Acción</h6>
                 <a class="collapse-item" href="/admin_php/actions/alumnos/indexalumno.php">Ver Alumnos</a>
-                <a class="collapse-item" href="/admin_php/actions/alumnos/reportalumno.php">Reporte General</a>
+                <a class="collapse-item" href="/admin_php/actions/alumnos/reportealumno.php">Reporte General</a>
             </div>
         </div>
     </li>
