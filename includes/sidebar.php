@@ -99,7 +99,7 @@ if (!isset($activePage)) $activePage = '';
 
     <!-- Heading -->
     <div class="sidebar-heading">
-        Reseumen de reportes
+        Resumen de reportes
     </div>
 
     <!-- Nav Item - Pages Collapse Menu -->
@@ -112,9 +112,9 @@ if (!isset($activePage)) $activePage = '';
         <div id="collapseReportes" class="collapse" aria-labelledby="headingReportes" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Elige una opción</h6>
-                <a class="collapse-item" href="login.html">Reporte de Alumno</a>
-                <a class="collapse-item" href="register.html">Reporte de Docente</a>
-                <a class="collapse-item" href="forgot-password.html">Reporte de Cursos</a>
+                <a class="collapse-item" href="/admin_php/reportespdf/reportealumnospdf.php">Reporte de Alumno</a>
+                <a class="collapse-item" href="/admin_php/reportespdf/reportedocentespdf.php">Reporte de Docente</a>
+                <a class="collapse-item" href="/admin_php/reportespdf/reportecursospdf.php">Reporte de Cursos</a>
             </div>
         </div>
     </li>
