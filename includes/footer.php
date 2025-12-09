@@ -10,11 +10,11 @@
 </a>
 
 <!-- Scripts JS (ajusta rutas) -->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="vendor/chart.js/Chart.min.js"></script>
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-<script src="js/sb-admin-2.min.js"></script>
+<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
+<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/admin_php/vendor/chart.js/Chart.min.js"></script>
+<script src="/admin_php/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="/admin_php/js/sb-admin-2.min.js"></script>
 <!-- Tus scripts personalizados -->
 </body>
 

@@ -28,7 +28,7 @@ ini_set('display_errors', 1);
         </div>
         <!-- FIN DEL CONTENIDO PRINCIPAL -->
 
-        <!-- FOOTER -->
+        <!-- FOOTER (NO MODIFICAR) -->
         <?php include 'includes/footer.php'; ?>
 
     </div>
@@ -37,73 +37,91 @@ ini_set('display_errors', 1);
 </div>
 <!-- FIN WRAPPER -->
 
-<!-- CHARTS JS -->
-<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
-<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- CHART.JS (🔥 obligatorio para que dibuje los gráficos) -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<!-- ============================== -->
+<!--   SCRIPT DE GRÁFICOS - ÚNICO   -->
+<!-- ============================== -->
 
 <script>
-    /* === AREA CHART === */
-    var ctxArea = document.getElementById('myAreaChart').getContext('2d');
+    document.addEventListener("DOMContentLoaded", function() {
 
-    var myAreaChart = new Chart(ctxArea, {
-        type: 'line',
-        data: {
-            labels: <?= json_encode($meses) ?>,
-            datasets: [{
-                label: 'Ganancias por Mes',
-                data: <?= json_encode($montos) ?>,
-                borderColor: '#4e73df',
-                backgroundColor: 'rgba(78,115,223,0.05)',
-                fill: true
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        min: 1000, // límite inferior
-                        max: 5000, // límite superior
-                        stepSize: 500, // intervalo entre marcas
-                        callback: function(value) {
-                            return "S/. " + value.toLocaleString(); // formato profesional
+        /* =====================
+           AREA CHART (LINE)
+           ===================== */
+        const areaCanvas = document.getElementById('myAreaChart');
+        if (areaCanvas) {
+            const ctxArea = areaCanvas.getContext('2d');
+
+            new Chart(ctxArea, {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode($meses) ?>,
+                    datasets: [{
+                        label: 'Ganancias por Mes',
+                        data: <?= json_encode($montos) ?>,
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78,115,223,0.05)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
                         }
                     },
-                    gridLines: {
-                        drawTicks: true,
-                        tickMarkLength: 8,
-                        color: "rgba(0, 0, 0, 0.05)",
-                        zeroLineColor: "rgba(0, 0, 0, 0.1)",
-                        drawBorder: false // 🔥 quita la línea dura del borde
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return "S/. " + value;
+                                }
+                            }
+                        },
+                        x: {}
                     }
-                }],
-                xAxes: [{
-                    gridLines: {
-                        display: false
+                }
+            });
+        }
+
+        /* =====================
+           PIE / DONUT CHART
+           ===================== */
+        const pieCanvas = document.getElementById('myPieChart');
+        if (pieCanvas) {
+            const ctxPie = pieCanvas.getContext('2d');
+
+            new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: <?= json_encode($categorias) ?>,
+                    datasets: [{
+                        data: <?= json_encode($ingresos) ?>,
+                        backgroundColor: [
+                            '#4e73df',
+                            '#1cc88a',
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#ff6384',
+                            '#8e44ad'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
                     }
-                }]
-            },
-            legend: {
-                display: true
-            }
+                }
+            });
         }
-    });
 
-
-
-    /* === PIE CHART === */
-    var ctxPie = document.getElementById('myPieChart').getContext('2d');
-
-    var myPieChart = new Chart(ctxPie, {
-        type: 'doughnut',
-        data: {
-            labels: <?= json_encode($categorias) ?>,
-            datasets: [{
-                data: <?= json_encode($ingresos) ?>,
-                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e']
-            }]
-        }
     });
 </script>

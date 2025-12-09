@@ -13,12 +13,12 @@ $cursos_total = $conn->query("SELECT COUNT(*) FROM curso")->fetch_row()[0];
 // Docentes totales
 $docentes_total = $conn->query("SELECT COUNT(*) FROM docente")->fetch_row()[0];
 
-// Ganancias totales (Opción B: precio del curso por matrícula activa)
+// Ganancias totales (Opción B: precio del curso cuando el alumno se matricula)
 $ganancias_total = $conn->query("
     SELECT SUM(c.precio) 
     FROM matricula m 
     JOIN curso c ON m.curso_id = c.id 
-    WHERE m.estado = 'Activo'
+    WHERE m.estado = 'Matriculado'
 ")->fetch_row()[0];
 
 if (!$ganancias_total) {
@@ -32,7 +32,7 @@ $area_result = $conn->query("
         SUM(c.precio) AS total
     FROM matricula m
     JOIN curso c ON m.curso_id = c.id
-    WHERE m.estado = 'Activo'
+    WHERE m.estado = 'Matriculado'
     GROUP BY MONTH(m.fecha_inscripcion)
     ORDER BY mes
 ");
@@ -52,7 +52,7 @@ $pie_result = $conn->query("
     FROM matricula m
     JOIN curso c ON m.curso_id = c.id
     JOIN categoria cat ON c.categoria_id = cat.id
-    WHERE m.estado = 'Activo'
+    WHERE m.estado = 'Matriculado'
     GROUP BY cat.id
 ");
 
