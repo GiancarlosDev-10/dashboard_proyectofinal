@@ -163,14 +163,14 @@
                 <a class="dropdown-item text-center small text-gray-500" href="#">Leer Más Mensajes</a>
             </div>
         </li>
-
-        <div class="topbar-divider d-none d-sm-block"></div>
-
         <!-- Nav Item - User Information -->
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Benjamin Huanca</span>
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                    ¡Bienvenido, <?= htmlspecialchars($_SESSION['admin_name'] ?? 'Invitado') ?>!
+                </span>
+
                 <img class="img-profile rounded-circle"
                     src="/admin_php/img/undraw_profile.svg">
             </a>

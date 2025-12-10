@@ -1,23 +1,38 @@
 <?php
-include 'db.php'; // Conexión a la base de datos
+session_start();
+include 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_POST['password'])) {
-    $usuario = $_POST['email'];
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $sql = "SELECT * FROM admin WHERE email = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
+    // Sanitizar entradas
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-    if ($stmt) {
-        $stmt->bind_param("ss", $usuario, $password);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    if ($email === '' || $password === '') {
+        echo "<script>alert('Todos los campos son obligatorios');</script>";
+    } else {
 
-        if ($result->num_rows === 1) {
-            header("Location: index2.php");
-            exit;
-        } else {
-            echo "Usuario o contraseña incorrectos.";
+        $sql = "SELECT * FROM admin WHERE email = ? AND password = ?";
+        $stmt = $conn->prepare($sql);
+
+        if ($stmt) {
+
+            $stmt->bind_param("ss", $email, $password);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+
+                $data = $result->fetch_assoc();
+
+                // Guardar el nombre desde la BD
+                $_SESSION['admin_name'] = $data['nombre'];
+
+                header("Location: index2.php");
+                exit;
+            } else {
+                echo "<script>alert('Usuario o contraseña incorrectos');</script>";
+            }
         }
     }
 }
@@ -67,37 +82,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_P
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">¡Bienvenido de nuevo!</h1>
                                     </div>
+                                    <?php if (isset($error)): ?>
+                                        <div class="alert alert-danger text-center" role="alert">
+                                            <?= $error ?>
+                                        </div>
+                                    <?php endif; ?>
+
                                     <form action="index.php" method="POST" class="user">
+
+                                        <!-- NOMBRE -->
                                         <div class="form-group">
-                                            <input type="name" class="form-control form-control-user"
-                                                name="admin" placeholder="Ingresa tu nombre">
+                                            <input type="text"
+                                                class="form-control form-control-user"
+                                                name="nombre"
+                                                placeholder="Ingresa tu nombre"
+                                                required>
                                         </div>
+
+                                        <!-- EMAIL -->
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-email"
-                                                name="email" placeholder="Ingresa tu dirección de correo">
+                                            <input type="text"
+                                                class="form-control form-control-user"
+                                                name="email"
+                                                placeholder="Ingresa tu dirección de correo"
+                                                required>
                                         </div>
-                                        <div class="form-group">
-                                            <input type="password" class="form-control form-control-password"
-                                                name="password" placeholder="Contraseña">
+
+                                        <!-- PASSWORD CON OJITO -->
+                                        <div class="form-group position-relative">
+                                            <input type="password"
+                                                class="form-control form-control-user"
+                                                name="password"
+                                                id="passwordInput"
+                                                placeholder="Contraseña"
+                                                required>
+
+                                            <span class="position-absolute"
+                                                style="right: 20px; top: 50%; transform: translateY(-50%); cursor: pointer;"
+                                                onclick="togglePassword()">
+                                                <i id="eyeIcon" class="fas fa-eye"></i>
+                                            </span>
                                         </div>
+
+                                        <!-- RECORDARME -->
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
                                                 <input type="checkbox" class="custom-control-input" id="customCheck">
                                                 <label class="custom-control-label" for="customCheck">Recordarme</label>
                                             </div>
                                         </div>
-                                        <form action="index.php" method="POST">
-                                            <!-- campos de usuario y contraseña -->
-                                            <button type="submit" class="btn btn-primary btn-user btn-block">Iniciar Sesión</button>
-                                        </form>
+
+                                        <!-- BOTÓN DE LOGIN -->
+                                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                                            Iniciar Sesión
+                                        </button>
+
                                         <hr>
-                                        <a href="index.html" class="btn btn-google btn-user btn-block">
+
+                                        <a href="#" class="btn btn-google btn-user btn-block">
                                             <i class="fab fa-google fa-fw"></i> Iniciar sesión con Google
                                         </a>
-                                        <a href="index.html" class="btn btn-facebook btn-user btn-block">
+
+                                        <a href="#" class="btn btn-facebook btn-user btn-block">
                                             <i class="fab fa-facebook-f fa-fw"></i> Iniciar sesión con Facebook
                                         </a>
+
                                     </form>
+
                                     <hr>
                                     <div class="text-center">
                                         <a class="small" href="forgot-password.html">¿Olvidaste tu contraseña?</a>
@@ -110,13 +161,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_P
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -126,6 +173,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_P
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("passwordInput");
+            const icon = document.getElementById("eyeIcon");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
 
 </body>
 
