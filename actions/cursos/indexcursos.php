@@ -1,4 +1,6 @@
-<?php include(__DIR__ . '/../../includes/header.php'); ?>
+<?php
+session_start();
+include(__DIR__ . '/../../includes/header.php'); ?>
 
 <div id="wrapper">
 
