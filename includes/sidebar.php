@@ -20,7 +20,7 @@ if (!isset($activePage)) $activePage = '';
 
     <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
-        <a class="nav-link" href="blank.php">
+        <a class="nav-link" href="/admin_php/reportespdf/documentacion.php">
             <i class="fas fa-file"></i>
             <span>Documentación</span></a>
     </li>

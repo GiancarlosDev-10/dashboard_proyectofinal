@@ -1,7 +1,6 @@
 <?php
 session_start();
 include 'db.php';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Sanitizar entradas
@@ -11,23 +10,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email === '' || $password === '') {
         echo "<script>alert('Todos los campos son obligatorios');</script>";
     } else {
-
         $sql = "SELECT * FROM admin WHERE email = ? AND password = ?";
         $stmt = $conn->prepare($sql);
 
         if ($stmt) {
-
             $stmt->bind_param("ss", $email, $password);
             $stmt->execute();
             $result = $stmt->get_result();
 
             if ($result->num_rows === 1) {
-
                 $data = $result->fetch_assoc();
-
                 // Guardar el nombre desde la BD
                 $_SESSION['admin_name'] = $data['nombre'];
-
+                $_SESSION['admin_email'] = $data['email'];
                 header("Location: index2.php");
                 exit;
             } else {
