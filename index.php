@@ -1,34 +1,53 @@
 <?php
 session_start();
-include 'db.php';
+require 'db.php';
+
+// Si el usuario ya está logueado, redirigir al dashboard
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Sanitizar entradas
-    $email = trim($_POST['email'] ?? '');
+    $email    = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
     if ($email === '' || $password === '') {
         echo "<script>alert('Todos los campos son obligatorios');</script>";
-    } else {
-        $sql = "SELECT * FROM admin WHERE email = ? AND password = ?";
-        $stmt = $conn->prepare($sql);
+        exit;
+    }
 
-        if ($stmt) {
-            $stmt->bind_param("ss", $email, $password);
-            $stmt->execute();
-            $result = $stmt->get_result();
+    // 1️⃣ Buscar usuario SOLO por email
+    $sql = "SELECT id, nombre, email, password, rol FROM admin WHERE email = ?";
+    $stmt = $conn->prepare($sql);
 
-            if ($result->num_rows === 1) {
-                $data = $result->fetch_assoc();
-                // Guardar el nombre desde la BD
-                $_SESSION['admin_name'] = $data['nombre'];
-                $_SESSION['admin_email'] = $data['email'];
-                header("Location: index2.php");
-                exit;
-            } else {
-                echo "<script>alert('Usuario o contraseña incorrectos');</script>";
-            }
+    if (!$stmt) {
+        die("Error en la consulta");
+    }
+
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // 2️⃣ Verificar si existe el usuario
+    if ($result->num_rows === 1) {
+
+        $data = $result->fetch_assoc();
+
+        // 3️⃣ Verificar contraseña hasheada
+        if (password_verify($password, $data['password'])) {
+
+            // 4️⃣ Guardar sesión
+            $_SESSION['admin_id']    = $data['id'];
+            $_SESSION['admin_name']  = $data['nombre'];
+            $_SESSION['admin_email'] = $data['email'];
+            $_SESSION['admin_rol']   = $data['rol'];
+
+            // 5️⃣ Redirigir al dashboard
+            header("Location: index2.php");
+            exit;
+        } else {
+            echo "<script>alert('Usuario o contraseña incorrectos');</script>";
         }
+    } else {
+        echo "<script>alert('Usuario o contraseña incorrectos');</script>";
     }
 }
 ?>
@@ -85,15 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     <form action="index.php" method="POST" class="user">
 
-                                        <!-- NOMBRE -->
-                                        <div class="form-group">
-                                            <input type="text"
-                                                class="form-control form-control-user"
-                                                name="nombre"
-                                                placeholder="Ingresa tu nombre"
-                                                required>
-                                        </div>
-
                                         <!-- EMAIL -->
                                         <div class="form-group">
                                             <input type="text"
@@ -103,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 required>
                                         </div>
 
-                                        <!-- PASSWORD CON OJITO -->
+                                        <!-- VISUALIZACION DE CONTRASEÑA -->
                                         <div class="form-group position-relative">
                                             <input type="password"
                                                 class="form-control form-control-user"
