@@ -16,33 +16,44 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="text-primary mb-0">Lista de Matrículas</h3>
 
-                    <!-- BOTÓN AGREGAR -->
                     <button class="btn btn-success" data-toggle="modal" data-target="#addModal">
-                        <i class="fa fa-plus"></i> Agregar Matrícula
+                        <i class="fa fa-plus"></i> Agregar matrícula
                     </button>
+                </div>
+
+                <!-- Buscador -->
+                <div class="mb-3">
+                    <input type="text" id="busqueda" class="form-control" placeholder="Buscar matrícula...">
                 </div>
 
                 <?php
                 include("../../db.php");
 
-                $registrosPorPagina = 10;
+                $registros = 10;
                 $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
                 if ($pagina < 1) $pagina = 1;
-                $inicio = ($pagina - 1) * $registrosPorPagina;
+                $inicio = ($pagina - 1) * $registros;
 
                 $total = $conn->query("SELECT COUNT(*) FROM matricula")->fetch_row()[0];
-                $paginas = ceil($total / $registrosPorPagina);
+                $paginas = ceil($total / $registros);
 
                 $sql = "
-                    SELECT m.*, a.nombre AS alumno, c.nombre AS curso, c.precio
+                    SELECT m.*, 
+                           a.nombre AS alumno,
+                           c.nombre AS curso,
+                           c.precio
                     FROM matricula m
                     JOIN alumno a ON m.alumno_id = a.id
-                    JOIN curso c  ON m.curso_id = c.id
+                    JOIN curso c ON m.curso_id = c.id
                     ORDER BY m.id DESC
-                    LIMIT $inicio, $registrosPorPagina
+                    LIMIT $inicio, $registros
                 ";
 
                 $result = $conn->query($sql);
+
+                // Selects
+                $alumnos = $conn->query("SELECT id, nombre FROM alumno ORDER BY nombre");
+                $cursos  = $conn->query("SELECT id, nombre FROM curso ORDER BY nombre");
                 ?>
 
                 <table class="table table-bordered table-striped">
@@ -61,30 +72,32 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
                                 <td><?= $row['id'] ?></td>
-                                <td><?= $row['alumno'] ?></td>
-                                <td><?= $row['curso'] ?> (S/.<?= $row['precio'] ?>)</td>
-                                <td><?= $row['estado'] ?></td>
-                                <td><?= $row['fecha_inscripcion'] ?></td>
-
+                                <td><?= htmlspecialchars($row['alumno']) ?></td>
+                                <td><?= htmlspecialchars($row['curso']) ?> (S/.<?= number_format($row['precio'], 2) ?>)</td>
+                                <td><?= htmlspecialchars($row['estado']) ?></td>
+                                <td><?= htmlspecialchars($row['fecha_inscripcion']) ?></td>
                                 <td>
-                                    <!-- BOTÓN EDITAR -->
-                                    <button class="btn btn-warning btn-sm"
+                                    <!-- EDITAR -->
+                                    <button class="btn btn-warning"
                                         data-toggle="modal"
                                         data-target="#editModal"
                                         data-id="<?= $row['id'] ?>"
-                                        data-alumno="<?= $row['alumno'] ?>"
+                                        data-alumno="<?= htmlspecialchars($row['alumno']) ?>"
                                         data-curso="<?= $row['curso_id'] ?>"
-                                        data-estado="<?= $row['estado'] ?>"
-                                        data-fecha="<?= $row['fecha_inscripcion'] ?>">
-                                        Editar
+                                        data-fecha="<?= $row['fecha_inscripcion'] ?>"
+                                        data-estado="<?= $row['estado'] ?>">
+                                        <i class="fa fa-edit"></i> Editar
                                     </button>
 
-                                    <!-- BOTÓN ELIMINAR -->
-                                    <a href="deletematriculas.php?id=<?= $row['id'] ?>"
-                                        class="btn btn-danger btn-sm"
-                                        onclick="return confirm('¿Seguro que desea eliminar esta matrícula?');">
-                                        Eliminar
-                                    </a>
+                                    <!-- ELIMINAR -->
+                                    <button class="btn btn-danger"
+                                        data-toggle="modal"
+                                        data-target="#deleteModal"
+                                        data-id="<?= $row['id'] ?>"
+                                        data-alumno="<?= htmlspecialchars($row['alumno']) ?>"
+                                        data-curso="<?= htmlspecialchars($row['curso']) ?>">
+                                        <i class="fa fa-trash"></i> Eliminar
+                                    </button>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -108,154 +121,260 @@ include(__DIR__ . '/../../includes/header.php'); ?>
         </div>
     </div>
 
-</div> <!-- WRAPPER -->
-
+</div>
 
 <!-- ========================================================= -->
 <!-- MODAL EDITAR MATRÍCULA -->
 <!-- ========================================================= -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="editarmatriculas.php" method="POST">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">Editar Matrícula</h5>
+                <button class="close" data-dismiss="modal">&times;</button>
+            </div>
 
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title">Editar Matrícula</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <div class="modal-body">
+
+                <div id="successEdit" class="alert alert-success" style="display:none;">
+                    Matrícula actualizada correctamente
                 </div>
 
-                <div class="modal-body">
-
-                    <input type="hidden" name="id" id="edit-id">
+                <form id="formEditarMatricula">
+                    <input type="hidden" id="edit-id">
 
                     <div class="mb-3">
                         <label>Alumno</label>
-                        <input type="text" class="form-control" id="edit-alumno" readonly>
+                        <input type="text" id="edit-alumno" class="form-control" readonly>
                     </div>
-
-                    <?php
-                    $cursos2 = $conn->query("SELECT id, nombre FROM curso ORDER BY nombre");
-                    ?>
 
                     <div class="mb-3">
                         <label>Curso</label>
-                        <select name="curso_id" id="edit-curso" class="form-control" required>
-                            <?php while ($c = $cursos2->fetch_assoc()): ?>
-                                <option value="<?= $c['id'] ?>"><?= $c['nombre'] ?></option>
+                        <select id="edit-curso" class="form-control">
+                            <?php while ($c = $cursos->fetch_assoc()): ?>
+                                <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
                             <?php endwhile; ?>
                         </select>
+                        <small class="text-danger" id="error-edit-curso_id"></small>
                     </div>
 
                     <div class="mb-3">
                         <label>Fecha inscripción</label>
-                        <input type="date" name="fecha_inscripcion" id="edit-fecha" class="form-control" required>
+                        <input type="date" id="edit-fecha" class="form-control">
+                        <small class="text-danger" id="error-edit-fecha_inscripcion"></small>
                     </div>
 
                     <div class="mb-3">
                         <label>Estado</label>
-                        <select name="estado" id="edit-estado" class="form-control" required>
+                        <select id="edit-estado" class="form-control">
                             <option value="Matriculado">Matriculado</option>
                             <option value="Pendiente">Pendiente</option>
                         </select>
+                        <small class="text-danger" id="error-edit-estado"></small>
                     </div>
 
-                </div>
+                </form>
 
-                <div class="modal-footer">
-                    <button class="btn btn-primary" type="submit">Guardar cambios</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                </div>
+            </div>
 
-            </form>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnGuardarCambios">Guardar cambios</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
 
         </div>
     </div>
 </div>
-
 
 <!-- ========================================================= -->
 <!-- MODAL AGREGAR MATRÍCULA -->
 <!-- ========================================================= -->
-<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
 
-            <form action="addmatriculas.php" method="POST">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Agregar Matrícula</h5>
+                <button class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
 
-                <div class="modal-header bg-success">
-                    <h5 class="modal-title text-white">Agregar Matrícula</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <div class="modal-body">
+
+                <div id="successAdd" class="alert alert-success" style="display:none;">
+                    Matrícula registrada correctamente
                 </div>
 
-                <div class="modal-body">
-
-                    <?php
-                    $alumnos = $conn->query("SELECT id, nombre FROM alumno ORDER BY nombre");
-                    $cursos  = $conn->query("SELECT id, nombre FROM curso ORDER BY nombre");
-                    ?>
+                <form id="formAgregarMatricula">
 
                     <div class="mb-3">
                         <label>Alumno</label>
-                        <select name="alumno_id" class="form-control" required>
+                        <select id="alumno_id" class="form-control">
                             <option value="">Seleccione...</option>
-                            <?php while ($a = $alumnos->fetch_assoc()): ?>
-                                <option value="<?= $a['id'] ?>"><?= $a['nombre'] ?></option>
+                            <?php $alumnos->data_seek(0);
+                            while ($a = $alumnos->fetch_assoc()): ?>
+                                <option value="<?= $a['id'] ?>"><?= htmlspecialchars($a['nombre']) ?></option>
                             <?php endwhile; ?>
                         </select>
+                        <small class="text-danger" id="error-alumno_id"></small>
                     </div>
 
                     <div class="mb-3">
                         <label>Curso</label>
-                        <select name="curso_id" class="form-control" required>
+                        <select id="curso_id" class="form-control">
                             <option value="">Seleccione...</option>
-                            <?php while ($c = $cursos->fetch_assoc()): ?>
-                                <option value="<?= $c['id'] ?>"><?= $c['nombre'] ?></option>
+                            <?php $cursos->data_seek(0);
+                            while ($c = $cursos->fetch_assoc()): ?>
+                                <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['nombre']) ?></option>
                             <?php endwhile; ?>
                         </select>
+                        <small class="text-danger" id="error-curso_id"></small>
                     </div>
 
                     <div class="mb-3">
                         <label>Fecha inscripción</label>
-                        <input type="date" name="fecha_inscripcion" class="form-control" required>
+                        <input type="date" id="fecha_inscripcion" class="form-control">
+                        <small class="text-danger" id="error-fecha_inscripcion"></small>
                     </div>
 
                     <div class="mb-3">
                         <label>Estado</label>
-                        <select name="estado" class="form-control" required>
+                        <select id="estado" class="form-control">
                             <option value="Matriculado">Matriculado</option>
                             <option value="Pendiente">Pendiente</option>
                         </select>
+                        <small class="text-danger" id="error-estado"></small>
                     </div>
 
-                </div>
+                </form>
 
-                <div class="modal-footer">
-                    <button class="btn btn-success" type="submit">Registrar</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                </div>
+            </div>
 
-            </form>
+            <div class="modal-footer">
+                <button class="btn btn-success" id="btnRegistrar">Registrar</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
 
         </div>
     </div>
 </div>
 
+<!-- ========================================================= -->
+<!-- MODAL ELIMINAR MATRÍCULA -->
+<!-- ========================================================= -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
 
-<!-- ========================================================= -->
-<!-- SCRIPTS (IGUAL QUE DOCENTES) -->
-<!-- ========================================================= -->
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body text-center">
+                ¿Eliminar la matrícula de <strong id="delete-alumno"></strong>
+                en el curso <strong id="delete-curso"></strong>?
+                <input type="hidden" id="delete-id">
+            </div>
+
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger" id="btnEliminar">Eliminar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <script src="/admin_php/vendor/jquery/jquery.min.js"></script>
 <script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    $('#editModal').on('show.bs.modal', function(event) {
-        let b = $(event.relatedTarget);
+    $(document).ready(function() {
 
-        $('#edit-id').val(b.data('id'));
-        $('#edit-alumno').val(b.data('alumno'));
-        $('#edit-curso').val(b.data('curso'));
-        $('#edit-fecha').val(b.data('fecha'));
-        $('#edit-estado').val(b.data('estado'));
+        function limpiarErrores() {
+            $('.text-danger').text('');
+            $('#successAdd, #successEdit').hide();
+        }
+
+        // BUSCADOR
+        $('#busqueda').on('input', function() {
+            const f = this.value.toLowerCase();
+            $('table tbody tr').each(function() {
+                $(this).toggle($(this).text().toLowerCase().includes(f));
+            });
+        });
+
+        // AGREGAR
+        $('#btnRegistrar').click(function() {
+            limpiarErrores();
+
+            $.post('addmatriculas.php', {
+                alumno_id: $('#alumno_id').val(),
+                curso_id: $('#curso_id').val(),
+                fecha_inscripcion: $('#fecha_inscripcion').val(),
+                estado: $('#estado').val()
+            }, function(resp) {
+                if (resp.success) {
+                    $('#successAdd').show();
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    $.each(resp.errors, (c, m) => $('#error-' + c).text(m));
+                }
+            }, 'json');
+        });
+
+        // CARGAR EDIT
+        $('#editModal').on('show.bs.modal', function(e) {
+            const b = $(e.relatedTarget);
+            limpiarErrores();
+            $('#edit-id').val(b.data('id'));
+            $('#edit-alumno').val(b.data('alumno'));
+            $('#edit-curso').val(b.data('curso'));
+            $('#edit-fecha').val(b.data('fecha'));
+            $('#edit-estado').val(b.data('estado'));
+        });
+
+        // EDITAR
+        $('#btnGuardarCambios').click(function() {
+            limpiarErrores();
+
+            $.post('editarmatriculas.php', {
+                id: $('#edit-id').val(),
+                curso_id: $('#edit-curso').val(),
+                fecha_inscripcion: $('#edit-fecha').val(),
+                estado: $('#edit-estado').val()
+            }, function(resp) {
+                if (resp.success) {
+                    $('#successEdit').show();
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    $.each(resp.errors, (c, m) => $('#error-edit-' + c).text(m));
+                }
+            }, 'json');
+        });
+
+        // ELIMINAR
+        $('#deleteModal').on('show.bs.modal', function(e) {
+            const b = $(e.relatedTarget);
+            $('#delete-id').val(b.data('id'));
+            $('#delete-alumno').text(b.data('alumno'));
+            $('#delete-curso').text(b.data('curso'));
+        });
+
+        $('#btnEliminar').click(function() {
+            $.post('deletematriculas.php', {
+                id: $('#delete-id').val()
+            }, function(resp) {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message);
+                }
+            }, 'json');
+        });
+
     });
 </script>
+
+<?php include(__DIR__ . '/../../includes/footer.php'); ?>
