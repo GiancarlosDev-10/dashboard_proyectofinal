@@ -1,272 +1,518 @@
 # 📊 CERSA – Sistema de Gestión Académica
 
-Sistema web desarrollado en **PHP + MySQL** para la gestión integral de una institución educativa.  
-Permite administrar **alumnos, docentes, cursos y matrículas**, generar **reportes dinámicos** y **exportarlos en PDF**, todo desde un **panel administrativo moderno**.
+Sistema web completo desarrollado en **PHP 8 + MySQL** para la gestión integral de una institución educativa.  
+Permite administrar **alumnos, docentes, cursos y matrículas**, generar **reportes dinámicos en PDF**, **tickets de pago**, gestionar **perfiles con fotos** y visualizar **estadísticas en tiempo real**.
 
 ---
 
 ## 🚀 Funcionalidades Principales
 
-### 🔐 Autenticación
+### 🔐 Autenticación y Autorización
 
-- Login de administrador
-- Manejo de sesiones
-- Mensaje de bienvenida personalizado
-- Cierre de sesión seguro
+- ✅ Sistema de login seguro con hash de contraseñas (`password_hash()` / `password_verify()`)
+- ✅ Manejo de sesiones con protección contra Session Fixation
+- ✅ **Roles de usuario:** Admin y Alumno
+- ✅ **Restricciones de acceso** según rol (sidebar dinámico)
+- ✅ Protección CSRF con tokens en formularios sensibles
+- ✅ Validación server-side en todas las operaciones
+- ✅ Registro de logs para auditoría con `error_log()`
+- ✅ Cierre de sesión seguro con destrucción completa de cookies y sesión
 
-### 👨‍🎓 Gestión de Alumnos
+**Credenciales de prueba:**
 
-- Crear, editar y eliminar alumnos
-- Búsqueda y paginación
-- Reporte general con gráficos
-- Exportación a PDF
+- **Admin:** `giancarlos@cersa.com` / `admin123`
+- **Alumno:** `alumno@cersa.com` / `alumno123`
+
+---
+
+### 👨‍🎓 Gestión de Alumnos (CRUD Completo)
+
+- ✅ Crear, editar y eliminar alumnos con validaciones completas
+- ✅ **Validaciones server-side:**
+  - Nombre (mín. 3 caracteres, máx. 100)
+  - DNI (8 dígitos numéricos, único en el sistema)
+  - Email (formato válido, único en el sistema)
+  - Celular (9 dígitos numéricos)
+- ✅ Búsqueda en tiempo real (sin recargar página)
+- ✅ Paginación (10 registros por página)
+- ✅ Manejo de errores con try-catch
+- ✅ Mensajes de error claros y específicos
+- ✅ Modal de confirmación para eliminar
+- ✅ Reporte general con gráficos
+- ✅ Exportación a PDF
+
+---
 
 ### 👩‍🏫 Gestión de Docentes
 
-- Registro y edición de docentes
-- Listado general
-- Reporte PDF institucional
+- ✅ Registro y edición de docentes
+- ✅ Validaciones completas (DNI único, email válido)
+- ✅ Listado general con búsqueda y paginación
+- ✅ Relación con cursos (1:N)
+- ✅ Reporte PDF institucional
+
+---
 
 ### 📚 Gestión de Cursos
 
-- Administración de cursos
-- Asociación con categorías, modalidades y docentes
-- Reportes visuales
-- Exportación a PDF
+- ✅ Administración completa de cursos
+- ✅ **Relaciones:**
+  - Categoría (Programación, Diseño, Idiomas, Marketing)
+  - Modalidad (Virtual en vivo, Video, Presencial)
+  - Docente asignado
+- ✅ Campos: nombre, precio, cupos, duración, estado
+- ✅ Reportes visuales con gráficos
+- ✅ Exportación a PDF
 
-### 📝 Matrículas
+---
 
-- Registro de matrículas
-- Estados: _Matriculado_ / _Pendiente_
-- Control por fechas
-- Reportes y estadísticas
+### 📝 Matrículas (Relación N:M)
+
+- ✅ Registro de matrículas (relaciona Alumnos ↔ Cursos)
+- ✅ Estados: _Matriculado_ / _Pendiente_
+- ✅ Control por fechas de inscripción
+- ✅ Listado con **nombres reales** (no IDs):
+  - Muestra nombre del alumno
+  - Muestra nombre del curso con precio
+- ✅ Reportes y estadísticas
+- ✅ Exportación a PDF
+
+---
+
+### 🎫 Generador de Tickets de Pago
+
+- ✅ **Búsqueda de alumnos** por nombre, DNI o email
+- ✅ Listado de alumnos con paginación
+- ✅ **Modal dinámico** que muestra:
+  - Datos del alumno seleccionado
+  - Cursos matriculados con modalidad y precio
+  - Total a pagar calculado automáticamente
+- ✅ **Generación de PDF profesional** con:
+  - Logo institucional CERSA
+  - Número de ticket único
+  - Fecha y hora de emisión
+  - Datos completos del alumno
+  - Detalle de cursos en tabla
+  - Total destacado
+  - Código QR para verificación
+  - Nota legal al pie
+
+---
+
+### 👤 Gestión de Perfiles con Fotos
+
+- ✅ **Subida de fotos de perfil** (JPG, PNG, GIF)
+- ✅ **Validaciones:**
+  - Tipo de archivo permitido
+  - Tamaño máximo (2MB)
+  - Nombres únicos con timestamp
+- ✅ **Almacenamiento seguro** en `/img/fotos/`
+- ✅ **Campos en BD:** `foto` y `descripcion`
+- ✅ Vista previa de foto en perfil
+- ✅ Edición de descripción personalizada
+- ✅ Fotos circulares en el diseño
+- ✅ Diferenciación visual entre roles (Admin / Alumno)
 
 ---
 
 ## 📈 Dashboard Administrativo
 
-Panel principal con **indicadores en tiempo real**:
+Panel principal con **indicadores dinámicos en tiempo real**:
 
-- Total de alumnos
-- Total de cursos
-- Total de docentes
-- Ganancias totales
-- Gráficos dinámicos:
-  - 📉 Ganancias por mes (línea)
-  - 🍩 Ingresos por categoría (donut)
+### 📊 Cards Superiores:
 
-> Los gráficos se generan automáticamente a partir de los datos reales registrados en el sistema.
+- 📌 Total de alumnos
+- 📌 Total de cursos
+- 📌 Total de docentes
+- 💰 Ganancias totales (S/.)
+
+### 📉 Gráficos Interactivos (Chart.js):
+
+- **Gráfico de líneas:** Ganancias por mes
+- **Gráfico de dona:** Ingresos por categoría
+
+> Los gráficos se generan automáticamente con datos reales del sistema.
 
 ---
 
-## 📄 Reportes en PDF
+## 📄 Reportes en PDF (FPDF)
 
-El sistema permite generar reportes profesionales en PDF con:
+Sistema completo de reportes profesionales con:
 
-- Logo institucional
-- Usuario que genera el reporte
-- Fecha y hora (zona horaria Perú 🇵🇪)
-- Tablas limpias y ordenadas
-- Sin IDs internos
-- Diseño institucional
+- ✅ Logo institucional CERSA
+- ✅ Usuario que genera el reporte
+- ✅ Fecha y hora (zona horaria Perú 🇵🇪)
+- ✅ Tablas limpias con encabezados estilizados
+- ✅ Sin mostrar IDs internos
+- ✅ Diseño institucional y profesional
 
-Reportes disponibles:
+### Reportes disponibles:
 
-- 📄 Reporte de Alumnos
-- 📄 Reporte de Docentes
-- 📄 Reporte de Cursos
-- 📄 Reporte de Matrículas
+1. 📄 **Reporte General de Alumnos**
+2. 📄 **Reporte General de Docentes**
+3. 📄 **Reporte General de Cursos**
+4. 📄 **Reporte General de Matrículas**
+5. 🎫 **Tickets de Pago Individuales**
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **PHP 8**
-- **MySQL**
-- **FPDF** (PDFs)
-- **Chart.js** (gráficos)
+### Backend:
+
+- **PHP 8.0+**
+- **MySQL / MariaDB**
+- **FPDF** (generación de PDFs)
+
+### Frontend:
+
+- **HTML5 / CSS3**
+- **JavaScript ES6+**
 - **Bootstrap 4**
-- **SB Admin 2**
-- **HTML5 / CSS3 / JavaScript**
-- **Font Awesome**
+- **SB Admin 2** (template administrativo)
+- **Chart.js** (gráficos dinámicos)
+- **jQuery 3.6** (AJAX y manipulación DOM)
+- **Font Awesome** (iconos)
+
+### Arquitectura:
+
+- **MVC adaptado** (separación de capas)
+- **Consultas preparadas** (prevención SQL Injection)
+- **Escape de salida** (prevención XSS)
+- **Tokens CSRF** (protección de formularios)
 
 ---
 
 ## 🗂️ Estructura del Proyecto
 
+```
 admin_php/
 │
-├── actions/ # Lógica CRUD (alumnos, docentes, cursos, matrículas)
-│ ├── alumnos/
-│ ├── docentes/
-│ ├── cursos/
-│ └── matriculas/
+├── actions/                    # Lógica CRUD con validaciones
+│   ├── alumnos/
+│   │   ├── indexalumno.php    # Listado con búsqueda y paginación
+│   │   ├── addalumno.php      # Crear con validaciones server-side
+│   │   ├── editaralumno.php   # Editar con validaciones
+│   │   ├── deletealumno.php   # Eliminar con confirmación
+│   │   └── reportealumno.php  # Reporte con gráficos
+│   ├── docentes/
+│   ├── cursos/
+│   └── matriculas/
 │
-├── includes/ # Componentes reutilizables
-│ ├── header.php
-│ ├── sidebar.php
-│ ├── topbar.php
-│ └── footer.php
+├── includes/                   # Componentes reutilizables
+│   ├── header.php             # <head> y estilos
+│   ├── sidebar.php            # Menú lateral dinámico por rol
+│   ├── topbar.php             # Barra superior con usuario
+│   └── footer.php             # Scripts y cierre
 │
-├── reportespdf/ # Generación de reportes en PDF
-│ ├── reportealumnos.php
-│ ├── reportedocentes.php
-│ ├── reportecursos.php
-│ └── reportematriculas.php
+├── reportespdf/                # Generación de PDFs con FPDF
+│   ├── documentacion.php      # Documentación del sistema
+│   ├── reportealumnospdf.php
+│   ├── reportedocentespdf.php
+│   ├── reportecursospdf.php
+│   └── ticketpago.php         # Tickets de pago individuales
 │
-├── vendor/ # Librerías externas
-│ ├── bootstrap/
-│ ├── chart.js/
-│ ├── datatables/
-│ ├── fontawesome-free/
-│ ├── jquery/
-│ └── fpdf/
+├── vendor/                     # Librerías externas
+│   ├── bootstrap/
+│   ├── chart.js/
+│   ├── jquery/
+│   ├── jquery-ui/             # Autocompletado (no usado finalmente)
+│   ├── fontawesome-free/
+│   └── fpdf/
 │
-├── img/ # Recursos gráficos
-│ ├── logo_cersa.png
-│ └── undraw_profile.svg
+├── img/                        # Recursos gráficos
+│   ├── fotos/                 # Fotos de perfil subidas
+│   ├── logo_cersa.png
+│   └── undraw_profile.svg
 │
-├── css/ # Estilos personalizados
-├── js/ # Scripts personalizados
-├── scss/ # Estilos SCSS (opcional)
+├── css/                        # Estilos personalizados
+├── js/                         # Scripts personalizados
 │
-├── db.php # Conexión a la base de datos
-├── index.php # Login
-├── index2.php # Dashboard principal
-├── blank.php # Página base
-└── README.md
+├── db.php                      # Conexión a MySQL
+├── index.php                   # Login con validaciones
+├── index2.php                  # Dashboard principal
+├── generar_tickets.php         # Generador de tickets
+├── perfil.php                  # Gestión de perfil con foto
+├── logout.php                  # Cierre de sesión seguro
+└── README.md                   # Este archivo
+```
 
 ---
 
 ## ⚙️ Instalación y Configuración
 
-1. **Clonar el repositorio**
-   ```bash
-   git clone https://github.com/tu-usuario/cersa-sistema-academico.git
+### 1️⃣ **Requisitos del Sistema**
+
+- PHP >= 8.0
+- MySQL >= 5.7 o MariaDB >= 10.2
+- Servidor web (Apache/Nginx)
+- Extensiones PHP necesarias:
+  - `mysqli`
+  - `gd` (para manipulación de imágenes)
+  - `mbstring`
+  - `json`
+
+### 2️⃣ **Clonar el Repositorio**
+
+```bash
+git clone https://github.com/tu-usuario/cersa-sistema-academico.git
+cd cersa-sistema-academico
+```
+
+### 3️⃣ **Importar la Base de Datos**
+
+1. Abrir **phpMyAdmin**
+2. Crear una base de datos:
+   ```sql
+   CREATE DATABASE proyecto_final CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
+3. Importar el archivo `schema.sql` (estructura)
+4. Importar el archivo `seed.sql` (datos de prueba)
 
-Importar la base de datos
+### 4️⃣ **Configurar la Conexión**
 
-Abrir phpMyAdmin
+Editar el archivo `db.php`:
 
-Crear una base de datos (por ejemplo: proyecto_final)
+```php
+<?php
+$host = "localhost";
+$user = "root";           // Tu usuario de MySQL
+$pass = "";               // Tu contraseña de MySQL
+$db   = "proyecto_final"; // Nombre de tu base de datos
 
-Importar el archivo .sql
+$conn = new mysqli($host, $user, $pass, $db);
 
-Configurar la conexión
-Editar el archivo db.php:
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
+}
 
-$conn = new mysqli("localhost", "usuario", "password", "nombre_bd");
+$conn->set_charset("utf8mb4");
+?>
+```
 
-Mover el proyecto
+### 5️⃣ **Mover el Proyecto**
+
 Colocar la carpeta dentro de:
 
-htdocs/ (XAMPP)
+- **XAMPP:** `C:/xampp/htdocs/`
+- **WAMP:** `C:/wamp64/www/`
+- **MAMP:** `/Applications/MAMP/htdocs/`
 
-## Acceder al sistema
+### 6️⃣ **Configurar Permisos (Linux/Mac)**
 
-http://localhost/admin_php
+```bash
+chmod 755 admin_php/
+chmod 777 admin_php/img/fotos/  # Para subir imágenes
+```
 
-👤 Usuario de Prueba
-Email: giancarlos@cersa.com
-Contraseña: admin123
+### 7️⃣ **Acceder al Sistema**
 
-## 📄 Reportes en PDF
+Abrir en el navegador:
 
-El sistema genera reportes en PDF utilizando FPDF, con el siguiente formato:
+```
+http://localhost/admin_php/
+```
 
-- Logo institucional (CERSA)
-- Título del reporte
-- Usuario que genera el reporte
-- Correo del usuario logueado
-- Fecha y hora (zona horaria Perú 🇵🇪)
-- Tablas limpias y ordenadas
-- Sin mostrar IDs internos
-- Encabezados con fondo gris suave
+---
 
-## Reportes disponibles:
+## 👤 Credenciales de Prueba
 
-📄 Reporte General de Alumnos
-📄 Reporte General de Docentes
-📄 Reporte General de Cursos
-📄 Reporte General de Matrículas
-📈 Dashboard Administrativo
+### **Administrador:**
 
-El panel principal incluye:
+- **Email:** `giancarlos@cersa.com`
+- **Contraseña:** `admin123`
+- **Acceso completo:** Alumnos, Cursos, Docentes, Matrículas, Reportes, Tickets
 
-Cards superiores:
+### **Alumno:**
 
-Total de alumnos
+- **Email:** `alumno@cersa.com`
+- **Contraseña:** `alumno123`
+- **Acceso limitado:** Cursos, Docentes (solo visualización)
 
-Total de cursos
+---
 
-Total de docentes
+## 🔐 Características de Seguridad
 
-Ganancias totales
+- ✅ **Hash de contraseñas** con `password_hash()` (bcrypt)
+- ✅ **Consultas preparadas** (prevención SQL Injection)
+- ✅ **Tokens CSRF** en formularios sensibles
+- ✅ **Validación server-side** en todas las operaciones
+- ✅ **Escape de salida** con `htmlspecialchars()` (prevención XSS)
+- ✅ **Session Regeneration** (prevención Session Fixation)
+- ✅ **Logs de auditoría** con `error_log()`
+- ✅ **Validación de archivos subidos** (tipo, tamaño, extensión)
+- ✅ **Protección de rutas** según rol de usuario
 
-Gráficos dinámicos:
+---
 
-📉 Ganancias por mes (gráfico de líneas)
+## 📊 Modelo de Datos (Relaciones)
 
-🍩 Ingresos por categoría (gráfico donut)
+```
+┌─────────────┐       ┌──────────────┐       ┌─────────────┐
+│   alumno    │       │  matricula   │       │    curso    │
+├─────────────┤       ├──────────────┤       ├─────────────┤
+│ id (PK)     │───┐   │ id (PK)      │   ┌───│ id (PK)     │
+│ nombre      │   └──→│ alumno_id(FK)│   │   │ nombre      │
+│ dni (UNIQUE)│       │ curso_id (FK)│←──┘   │ precio      │
+│ email       │       │ fecha_insc   │       │ docente_id  │
+│ celular     │       │ estado       │       │ modalidad_id│
+│ foto        │       └──────────────┘       │ categoria_id│
+│ password    │                              └─────────────┘
+│ rol         │                                     ↓
+└─────────────┘                              ┌─────────────┐
+                                             │   docente   │
+      ┌──────────────┐                      ├─────────────┤
+      │  modalidad   │                      │ id (PK)     │
+      ├──────────────┤                      │ nombre      │
+      │ id (PK)      │                      │ especialidad│
+      │ nombre       │                      │ dni         │
+      └──────────────┘                      └─────────────┘
 
-Los gráficos se actualizan automáticamente según los datos reales del sistema.
+      ┌──────────────┐
+      │  categoria   │
+      ├──────────────┤
+      │ id (PK)      │
+      │ nombre       │
+      └──────────────┘
+```
 
-🛠️ Tecnologías Utilizadas
+**Relaciones:**
 
-PHP 8
+- **1:N** - Un docente puede tener muchos cursos
+- **N:M** - Alumnos y Cursos se relacionan a través de Matrículas
 
-MySQL
+---
 
-FPDF (reportes PDF)
+## 📝 Casos de Prueba
 
-Chart.js (gráficos dinámicos)
+### ✅ **Test 1: Login**
 
-Bootstrap 4
+1. Ir a `http://localhost/admin_php/`
+2. Ingresar credenciales de admin
+3. Verificar redirección al dashboard
+4. Verificar que aparece "¡Bienvenido, Giancarlos!"
 
-SB Admin 2
+### ✅ **Test 2: Agregar Alumno**
 
-HTML5 / CSS3
+1. Ir a Alumnos → Agregar
+2. Llenar formulario con datos válidos
+3. Verificar que se guarda correctamente
+4. Verificar mensaje de éxito
 
-JavaScript
+### ✅ **Test 3: Validación de DNI Duplicado**
 
-Font Awesome
+1. Intentar agregar alumno con DNI existente
+2. Verificar mensaje: "El DNI ya está registrado"
 
-🔐 Seguridad y Sesiones
+### ✅ **Test 4: Generar Ticket de Pago**
 
-Autenticación mediante login
+1. Ir a "Generar Tickets"
+2. Buscar un alumno (ej: "Karla")
+3. Clic en "Ver Cursos"
+4. Verificar que muestra los cursos matriculados
+5. Clic en "Generar Ticket de Pago"
+6. Verificar que se abre el PDF correctamente
 
-Manejo de sesiones con $\_SESSION
+### ✅ **Test 5: Subir Foto de Perfil**
 
-Nombre y correo del usuario visibles en el topbar
+1. Ir a Perfil (menú usuario arriba)
+2. Clic en "Seleccionar archivo"
+3. Elegir imagen JPG < 2MB
+4. Clic en "Guardar"
+5. Verificar que la foto se muestra en el perfil
 
-Protección de páginas internas
+### ✅ **Test 6: Roles de Usuario**
 
-Cierre de sesión seguro
+1. Iniciar sesión como alumno
+2. Verificar que NO aparecen opciones de admin en sidebar
+3. Cerrar sesión
+4. Iniciar como admin
+5. Verificar acceso completo
 
-📌 Estado del Proyecto
+---
 
-✅ Funcional
-✅ Listo para entrega académica
-✅ Preparado para presentación
-🛠️ Posibles mejoras futuras:
+## 🎯 Cumplimiento de Requisitos Académicos
 
-Roles de usuario
+| Requisito                               | Estado             | Evidencia                                         |
+| --------------------------------------- | ------------------ | ------------------------------------------------- |
+| **1. Autenticación y autorización**     | ✅ 100%            | Login con hash, roles admin/alumno, restricciones |
+| **2. CRUD completo**                    | ✅ 100%            | 4 entidades con paginación, relaciones 1:N y N:M  |
+| **3. Validación y manejo de errores**   | ✅ 100%            | Server-side, try-catch, mensajes claros           |
+| **4. Subida de archivos**               | ✅ 100%            | Fotos de perfil con validación tipo/tamaño        |
+| **5. Búsqueda, filtros y ordenamiento** | ✅ 100%            | Búsqueda tiempo real, paginación                  |
+| **6. Reportes / Export**                | ✅ 100%            | 5 tipos de PDF con FPDF                           |
+| **7. API básica (opcional)**            | ⚠️ No implementado | Opcional según requisitos                         |
 
-Encriptación de contraseñas
+---
 
-Exportar gráficos a PDF
+## 🛠️ Posibles Mejoras Futuras
 
-Dashboard para docentes
+- 🔄 Recuperación de contraseña por email
+- 📊 Más gráficos en el dashboard (barras, áreas)
+- 📱 App móvil con API REST
+- 🔔 Sistema de notificaciones en tiempo real
+- 📧 Envío automático de tickets por email
+- 🌐 Multi-idioma (español/inglés)
+- 🎨 Tema claro/oscuro
+- 📦 Export de reportes en Excel/CSV
+- 🔍 Filtros avanzados por fecha, estado, categoría
+- 👥 Chat entre alumnos y docentes
 
-Filtros avanzados en reportes
+---
 
-✨ Autor
+## 📸 Capturas de Pantalla
 
-Giancarlos
-Proyecto académico – Sistema de Gestión Académica
-🇵🇪 Perú
+### Dashboard Principal
 
-📜 Licencia
+![Dashboard](docs/screenshots/dashboard.png)
 
-Este proyecto es de uso educativo y académico.
+### Gestión de Alumnos
+
+![Alumnos](docs/screenshots/alumnos.png)
+
+### Generador de Tickets
+
+![Tickets](docs/screenshots/tickets.png)
+
+### Perfil con Foto
+
+![Perfil](docs/screenshots/perfil.png)
+
+---
+
+## 👨‍💻 Autor
+
+**Giancarlos**  
+Proyecto Final – Desarrollo de Soluciones Web Back-End  
+I.E.S.T.P "Gilda Liliana Ballivián Rosado"  
+🇵🇪 Perú - 2025
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de uso **educativo y académico**.  
+Desarrollado como proyecto final para la asignatura de Desarrollo Web Back-End.
+
+---
+
+## 🙏 Agradecimientos
+
+- Instituto Gilda Ballivián por la formación académica
+- Profesor Benjamín Huanca por la guía y requisitos del proyecto
+- SB Admin 2 por el template administrativo
+- FPDF por la librería de generación de PDFs
+- Chart.js por los gráficos dinámicos
+
+---
+
+## 📞 Contacto
+
+Para consultas sobre este proyecto:
+
+- **Email:** giancarlos@cersa.com
+- **GitHub:** [tu-usuario](https://github.com/tu-usuario)
+
+---
+
+**⭐ Si te sirvió este proyecto, no olvides darle una estrella en GitHub ⭐**
