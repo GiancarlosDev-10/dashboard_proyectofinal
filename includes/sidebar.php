@@ -135,9 +135,10 @@ $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
 
         <!-- Nav Item - Verificar Estado (SOLO ADMIN) -->
         <li class="nav-item">
-            <a class="nav-link" href="charts.html">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Verificar Estado</span></a>
+            <a class="nav-link" href="/admin_php/generar_tickets.php">
+                <i class="fas fa-fw fa-ticket-alt"></i>
+                <span>Generar Tickets</span>
+            </a>
         </li>
 
         <!-- Nav Item - Almacenar Recibos (SOLO ADMIN) -->
