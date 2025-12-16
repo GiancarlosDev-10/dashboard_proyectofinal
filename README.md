@@ -345,41 +345,31 @@ http://localhost/admin_php/
 
 ---
 
-## 📊 Modelo de Datos (Relaciones)
+## 📊 Diagrama Entidad-Relación
 
-```
-┌─────────────┐       ┌──────────────┐       ┌─────────────┐
-│   alumno    │       │  matricula   │       │    curso    │
-├─────────────┤       ├──────────────┤       ├─────────────┤
-│ id (PK)     │───┐   │ id (PK)      │   ┌───│ id (PK)     │
-│ nombre      │   └──→│ alumno_id(FK)│   │   │ nombre      │
-│ dni (UNIQUE)│       │ curso_id (FK)│←──┘   │ precio      │
-│ email       │       │ fecha_insc   │       │ docente_id  │
-│ celular     │       │ estado       │       │ modalidad_id│
-│ foto        │       └──────────────┘       │ categoria_id│
-│ password    │                              └─────────────┘
-│ rol         │                                     ↓
-└─────────────┘                              ┌─────────────┐
-                                             │   docente   │
-      ┌──────────────┐                      ├─────────────┤
-      │  modalidad   │                      │ id (PK)     │
-      ├──────────────┤                      │ nombre      │
-      │ id (PK)      │                      │ especialidad│
-      │ nombre       │                      │ dni         │
-      └──────────────┘                      └─────────────┘
+![Diagrama ER](./img/DER/DER_proyecto_final.png)
 
-      ┌──────────────┐
-      │  categoria   │
-      ├──────────────┤
-      │ id (PK)      │
-      │ nombre       │
-      └──────────────┘
-```
+### Descripción de Relaciones:
 
-**Relaciones:**
+- **alumno ↔ matricula ↔ curso**: Relación N:M (muchos a muchos)
+  - Un alumno puede inscribirse en múltiples cursos
+  - Un curso puede tener múltiples alumnos
+- **categoria → curso**: Relación 1:N
+  - Una categoría agrupa múltiples cursos (Programación, Diseño, Idiomas, Marketing)
+- **modalidad → curso**: Relación 1:N
+  - Una modalidad aplica a múltiples cursos (Virtual en vivo, Video, Presencial)
+- **docente → curso**: Relación 1:N
+  - Un docente puede dictar múltiples cursos
 
-- **1:N** - Un docente puede tener muchos cursos
-- **N:M** - Alumnos y Cursos se relacionan a través de Matrículas
+### Tablas del Sistema:
+
+- **admin**: Usuarios administradores del sistema
+- **alumno**: Estudiantes registrados
+- **docente**: Profesores que dictan cursos
+- **curso**: Cursos ofrecidos por la institución
+- **categoria**: Categorías de cursos
+- **modalidad**: Modalidades de enseñanza
+- **matricula**: Inscripciones de alumnos en cursos
 
 ---
 

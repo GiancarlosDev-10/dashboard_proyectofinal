@@ -47,88 +47,294 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                     </button>
                 </div>
 
-                <!-- Buscador -->
-                <div class="mb-3">
-                    <input type="text" id="busqueda" class="form-control" placeholder="Buscar alumno...">
+                <!-- ========================================================= -->
+                <!-- PANEL DE FILTROS Y BÚSQUEDA                              -->
+                <!-- ========================================================= -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-filter"></i> Filtros y Búsqueda
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="GET" action="indexalumno.php" id="formFiltros">
+                            <div class="row">
+
+                                <!-- Búsqueda por texto -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="busqueda">Buscar por nombre, DNI o email:</label>
+                                    <input type="text"
+                                        name="busqueda"
+                                        id="busqueda"
+                                        class="form-control"
+                                        placeholder="Escribe para buscar..."
+                                        value="<?= htmlspecialchars($_GET['busqueda'] ?? '') ?>">
+                                </div>
+
+                                <!-- Filtro por curso -->
+                                <div class="col-md-3 mb-3">
+                                    <label for="curso_filter">Filtrar por curso:</label>
+                                    <select name="curso_filter" id="curso_filter" class="form-control">
+                                        <option value="">Todos los cursos</option>
+                                        <?php
+                                        include("../../db.php");
+                                        $cursos = $conn->query("SELECT id, nombre FROM curso ORDER BY nombre");
+                                        while ($curso = $cursos->fetch_assoc()):
+                                            $selected = (isset($_GET['curso_filter']) && $_GET['curso_filter'] == $curso['id']) ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $curso['id'] ?>" <?= $selected ?>>
+                                                <?= htmlspecialchars($curso['nombre']) ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+
+                                <!-- Filtro por estado -->
+                                <div class="col-md-2 mb-3">
+                                    <label for="estado_filter">Filtrar por estado:</label>
+                                    <select name="estado_filter" id="estado_filter" class="form-control">
+                                        <option value="">Todos los estados</option>
+                                        <?php $estados = ['Activo', 'Inactivo'];
+                                        foreach ($estados as $est):
+                                            $sel = (isset($_GET['estado_filter']) && $_GET['estado_filter'] === $est) ? 'selected' : '';
+                                        ?>
+                                            <option value="<?= $est ?>" <?= $sel ?>><?= $est ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <!-- Ordenar por -->
+                                <div class="col-md-3 mb-3">
+                                    <label for="ordenar">Ordenar por:</label>
+                                    <select name="ordenar" id="ordenar" class="form-control">
+                                        <option value="id_desc" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] == 'id_desc') ? 'selected' : '' ?>>Más recientes</option>
+                                        <option value="id_asc" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] == 'id_asc') ? 'selected' : '' ?>>Más antiguos</option>
+                                        <option value="nombre_asc" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] == 'nombre_asc') ? 'selected' : '' ?>>Nombre (A-Z)</option>
+                                        <option value="nombre_desc" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] == 'nombre_desc') ? 'selected' : '' ?>>Nombre (Z-A)</option>
+                                        <option value="dni_asc" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] == 'dni_asc') ? 'selected' : '' ?>>DNI (menor a mayor)</option>
+                                        <option value="dni_desc" <?= (isset($_GET['ordenar']) && $_GET['ordenar'] == 'dni_desc') ? 'selected' : '' ?>>DNI (mayor a menor)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Botones -->
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fas fa-search"></i> Buscar
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <!-- Botón limpiar filtros -->
+                            <?php if (!empty($_GET['busqueda']) || !empty($_GET['curso_filter']) || !empty($_GET['ordenar']) || !empty($_GET['estado_filter'])): ?>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a href="indexalumno.php" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-times"></i> Limpiar filtros
+                                        </a>
+                                        <span class="text-muted ml-2">
+                                            <i class="fas fa-info-circle"></i> Filtros activos
+                                        </span>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Tabla -->
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>DNI</th>
-                            <th>Email</th>
-                            <th>Celular</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        include("../../db.php");
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>DNI</th>
+                                        <th>Email</th>
+                                        <th>Celular</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    // ============================================
+                                    // CONSTRUCCIÓN DE LA CONSULTA CON FILTROS
+                                    // ============================================
 
-                        $registrosPorPagina = 10;
-                        $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
-                        if ($pagina < 1) $pagina = 1;
-                        $inicio = ($pagina - 1) * $registrosPorPagina;
+                                    $registrosPorPagina = 10;
+                                    $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+                                    if ($pagina < 1) $pagina = 1;
+                                    $inicio = ($pagina - 1) * $registrosPorPagina;
 
-                        $totalRegistros = $conn->query("SELECT COUNT(*) FROM alumno")->fetch_row()[0];
-                        $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+                                    // Consulta base
+                                    $sql = "SELECT DISTINCT a.* FROM alumno a";
+                                    $where = [];
+                                    $params = [];
+                                    $types = "";
 
-                        $result = $conn->query("SELECT * FROM alumno LIMIT $inicio, $registrosPorPagina");
+                                    // Filtro por búsqueda de texto
+                                    if (!empty($_GET['busqueda'])) {
+                                        $busqueda = "%" . $_GET['busqueda'] . "%";
+                                        $where[] = "(a.nombre LIKE ? OR a.dni LIKE ? OR a.email LIKE ?)";
+                                        $params[] = $busqueda;
+                                        $params[] = $busqueda;
+                                        $params[] = $busqueda;
+                                        $types .= "sss";
+                                    }
 
-                        while ($row = $result->fetch_assoc()):
+                                    // Filtro por curso
+                                    if (!empty($_GET['curso_filter'])) {
+                                        $sql .= " INNER JOIN matricula m ON a.id = m.alumno_id";
+                                        $where[] = "m.curso_id = ?";
+                                        $params[] = (int)$_GET['curso_filter'];
+                                        $types .= "i";
+                                    }
+
+                                    // Filtro por estado
+                                    if (!empty($_GET['estado_filter'])) {
+                                        $where[] = "a.estado = ?";
+                                        $params[] = $_GET['estado_filter'];
+                                        $types .= "s";
+                                    }
+
+                                    // Agregar condiciones WHERE
+                                    if (!empty($where)) {
+                                        $sql .= " WHERE " . implode(" AND ", $where);
+                                    }
+
+                                    // Ordenamiento
+                                    $ordenar = $_GET['ordenar'] ?? 'id_desc';
+                                    switch ($ordenar) {
+                                        case 'id_asc':
+                                            $sql .= " ORDER BY a.id ASC";
+                                            break;
+                                        case 'nombre_asc':
+                                            $sql .= " ORDER BY a.nombre ASC";
+                                            break;
+                                        case 'nombre_desc':
+                                            $sql .= " ORDER BY a.nombre DESC";
+                                            break;
+                                        case 'dni_asc':
+                                            $sql .= " ORDER BY a.dni ASC";
+                                            break;
+                                        case 'dni_desc':
+                                            $sql .= " ORDER BY a.dni DESC";
+                                            break;
+                                        default:
+                                            $sql .= " ORDER BY a.id DESC";
+                                    }
+
+                                    // Contar total de registros
+                                    $sqlCount = str_replace("SELECT DISTINCT a.*", "SELECT COUNT(DISTINCT a.id) as total", $sql);
+                                    $sqlCount = preg_replace('/ORDER BY.*/', '', $sqlCount);
+
+                                    $stmtCount = $conn->prepare($sqlCount);
+                                    if (!empty($params)) {
+                                        $stmtCount->bind_param($types, ...$params);
+                                    }
+                                    $stmtCount->execute();
+                                    $totalRegistros = $stmtCount->get_result()->fetch_assoc()['total'];
+                                    $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+                                    $stmtCount->close();
+
+                                    // Agregar paginación
+                                    $sql .= " LIMIT ?, ?";
+                                    $params[] = $inicio;
+                                    $params[] = $registrosPorPagina;
+                                    $types .= "ii";
+
+                                    // Ejecutar consulta
+                                    $stmt = $conn->prepare($sql);
+                                    if (!empty($params)) {
+                                        $stmt->bind_param($types, ...$params);
+                                    }
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
+
+                                    if ($result->num_rows > 0):
+                                        while ($row = $result->fetch_assoc()):
+                                    ?>
+                                            <tr>
+                                                <td><?= $row['id'] ?></td>
+                                                <td><?= htmlspecialchars($row['nombre']) ?></td>
+                                                <td><?= htmlspecialchars($row['dni']) ?></td>
+                                                <td><?= htmlspecialchars($row['email']) ?></td>
+                                                <td><?= htmlspecialchars($row['celular']) ?></td>
+                                                <td class="text-center">
+
+                                                    <!-- Botón EDITAR -->
+                                                    <button class="btn btn-warning btn-sm"
+                                                        data-toggle="modal"
+                                                        data-target="#editModal"
+                                                        data-id="<?= $row['id'] ?>"
+                                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
+                                                        data-dni="<?= $row['dni'] ?>"
+                                                        data-email="<?= htmlspecialchars($row['email']) ?>"
+                                                        data-celular="<?= $row['celular'] ?>">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+
+                                                    <!-- Botón ELIMINAR -->
+                                                    <button class="btn btn-danger btn-sm"
+                                                        data-toggle="modal"
+                                                        data-target="#deleteModal"
+                                                        data-id="<?= $row['id'] ?>"
+                                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
+                                                        data-dni="<?= $row['dni'] ?>"
+                                                        data-email="<?= htmlspecialchars($row['email']) ?>">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+
+                                                </td>
+                                            </tr>
+                                        <?php
+                                        endwhile;
+                                    else:
+                                        ?>
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                                <p>No se encontraron alumnos con los filtros aplicados</p>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Información de resultados -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <p class="text-muted">
+                                    Mostrando <?= $result->num_rows ?> de <?= $totalRegistros ?> registros
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Paginación -->
+                        <?php if ($totalPaginas > 1):
+                            // Construir parámetros GET para paginación
+                            $getParams = $_GET;
+                            unset($getParams['pagina']);
+                            $queryString = http_build_query($getParams);
+                            $queryString = $queryString ? "&" . $queryString : "";
                         ?>
-                            <tr>
-                                <td><?= $row['id'] ?></td>
-                                <td><?= $row['nombre'] ?></td>
-                                <td><?= $row['dni'] ?></td>
-                                <td><?= $row['email'] ?></td>
-                                <td><?= $row['celular'] ?></td>
-                                <td>
-
-                                    <!-- Botón EDITAR -->
-                                    <button class="btn btn-warning btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
-                                        data-id="<?= $row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
-                                        data-dni="<?= $row['dni'] ?>"
-                                        data-email="<?= htmlspecialchars($row['email']) ?>"
-                                        data-celular="<?= $row['celular'] ?>">
-                                        <i class="fa fa-edit"></i> Editar
-                                    </button>
-
-                                    <!-- Botón ELIMINAR -->
-                                    <button class="btn btn-danger btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="<?= $row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
-                                        data-dni="<?= $row['dni'] ?>"
-                                        data-email="<?= htmlspecialchars($row['email']) ?>">
-                                        <i class="fa fa-trash"></i> Eliminar
-                                    </button>
-
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-
-                <!-- Paginación -->
-                <?php if ($totalPaginas > 1): ?>
-                    <nav>
-                        <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
-                                <li class="page-item <?= $i == $pagina ? 'active' : '' ?>">
-                                    <a class="page-link" href="indexalumno.php?pagina=<?= $i ?>"><?= $i ?></a>
-                                </li>
-                            <?php endfor; ?>
-                        </ul>
-                    </nav>
-                <?php endif; ?>
+                            <nav>
+                                <ul class="pagination justify-content-center">
+                                    <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
+                                        <li class="page-item <?= $i == $pagina ? 'active' : '' ?>">
+                                            <a class="page-link" href="indexalumno.php?pagina=<?= $i ?><?= $queryString ?>">
+                                                <?= $i ?>
+                                            </a>
+                                        </li>
+                                    <?php endfor; ?>
+                                </ul>
+                            </nav>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
             </div> <!-- container -->
 
@@ -501,11 +707,11 @@ include(__DIR__ . '/../../includes/header.php'); ?>
 
                         // Mostrar alerta de éxito
                         const alertHtml = `
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fa fa-check-circle"></i> ${response.message}
-                                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            </div>
-                        `;
+                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                                <i class="fa fa-check-circle"></i> ${response.message}
+                                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                            </div>
+                                        `;
                         $('.container.mt-4').prepend(alertHtml);
 
                         // Recargar página después de 1.5 segundos
@@ -519,11 +725,11 @@ include(__DIR__ . '/../../includes/header.php'); ?>
 
                         // Mostrar alerta de error
                         const alertHtml = `
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fa fa-exclamation-triangle"></i> ${response.message}
-                                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            </div>
-                        `;
+                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                <i class="fa fa-exclamation-triangle"></i> ${response.message}
+                                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                            </div>
+                                        `;
                         $('.container.mt-4').prepend(alertHtml);
 
                         $('#btnConfirmarEliminar').prop('disabled', false).html('<i class="fa fa-trash"></i> Sí, eliminar');
@@ -572,7 +778,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
         });
 
         // ============================================
-        // BUSCADOR EN TABLA
+        // BUSCADOR EN TABLA (cliente) - conserva comportamiento previo
         // ============================================
 
         document.getElementById('busqueda').addEventListener('input', function() {
