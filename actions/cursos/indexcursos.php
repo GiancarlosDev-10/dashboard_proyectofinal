@@ -83,26 +83,26 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
                                 <td><?= $row['id'] ?></td>
-                                <td><?= htmlspecialchars($row['nombre']) ?></td>
-                                <td><?= htmlspecialchars($row['categoria']) ?></td>
-                                <td><?= htmlspecialchars($row['modalidad']) ?></td>
-                                <td><?= htmlspecialchars($row['fecha_inicio']) ?></td>
+                                <td><?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($row['categoria'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($row['modalidad'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($row['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= (int)$row['cupos'] ?></td>
                                 <td>S/. <?= number_format((float)$row['precio'], 2) ?></td>
-                                <td><?= htmlspecialchars($row['estado']) ?></td>
+                                <td><?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <!-- EDITAR -->
                                     <button class="btn btn-warning btn-sm"
                                         data-toggle="modal"
                                         data-target="#editModal"
                                         data-id="<?= $row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
-                                        data-categoria="<?= $row['categoria_id'] ?>"
-                                        data-modalidad="<?= $row['modalidad_id'] ?>"
-                                        data-fecha="<?= $row['fecha_inicio'] ?>"
-                                        data-cupos="<?= $row['cupos'] ?>"
-                                        data-precio="<?= $row['precio'] ?>"
-                                        data-estado="<?= $row['estado'] ?>">
+                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-categoria="<?= (int)$row['categoria_id'] ?>"
+                                        data-modalidad="<?= (int)$row['modalidad_id'] ?>"
+                                        data-fecha="<?= htmlspecialchars($row['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-cupos="<?= (int)$row['cupos'] ?>"
+                                        data-precio="<?= htmlspecialchars($row['precio'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-estado="<?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fa fa-edit"></i> Editar
                                     </button>
 
@@ -110,8 +110,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                     <button class="btn btn-danger btn-sm"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
-                                        data-id="<?= $row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>">
+                                        data-id="<?= (int)$row['id'] ?>"
+                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fa fa-trash"></i> Eliminar
                                     </button>
                                 </td>

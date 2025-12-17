@@ -7,6 +7,11 @@ require(__DIR__ . '/../db.php');
 // ⚠ Recuperar datos del usuario logueado
 $usuario = $_SESSION['admin_name'] ?? 'Usuario';
 $correo  = $_SESSION['admin_email'] ?? 'Correo no disponible';
+// Sanitizar valores para evitar contenido inesperado en el PDF
+$usuario = strip_tags($usuario);
+$usuario = preg_replace('/[\x00-\x1F\x7F]/', '', $usuario);
+$correo = strip_tags($correo);
+$correo = preg_replace('/[\x00-\x1F\x7F]/', '', $correo);
 $fecha   = date('d/m/Y H:i:s');
 
 // Crear PDF
@@ -52,9 +57,15 @@ $pdf->SetFont('Arial', '', 10);
 $consulta = $conn->query("SELECT nombre, dni, email FROM alumno ORDER BY nombre ASC");
 
 while ($row = $consulta->fetch_assoc()) {
-    $pdf->Cell(80, 8, utf8_decode($row['nombre']), 1);
-    $pdf->Cell(40, 8, $row['dni'], 1);
-    $pdf->Cell(70, 8, utf8_decode($row['email']), 1);
+    $nombre = strip_tags($row['nombre']);
+    $nombre = preg_replace('/[\x00-\x1F\x7F]/', '', $nombre);
+    $dni = preg_replace('/[^0-9A-Za-z\-]/', '', $row['dni']);
+    $email = strip_tags($row['email']);
+    $email = preg_replace('/[\x00-\x1F\x7F]/', '', $email);
+
+    $pdf->Cell(80, 8, utf8_decode($nombre), 1);
+    $pdf->Cell(40, 8, $dni, 1);
+    $pdf->Cell(70, 8, utf8_decode($email), 1);
     $pdf->Ln();
 }
 

@@ -10,6 +10,11 @@ require(__DIR__ . '/../db.php');
 // ===============================
 $usuario = $_SESSION['admin_name'] ?? 'Usuario';
 $correo  = $_SESSION['admin_email'] ?? 'Correo no disponible';
+// Sanitizar valores para evitar contenido inesperado en el PDF
+$usuario = strip_tags($usuario);
+$usuario = preg_replace('/[\x00-\x1F\x7F]/', '', $usuario);
+$correo = strip_tags($correo);
+$correo = preg_replace('/[\x00-\x1F\x7F]/', '', $correo);
 $fecha   = date('d/m/Y H:i:s');
 
 // ===============================
@@ -62,9 +67,15 @@ $consulta = $conn->query("
 ");
 
 while ($row = $consulta->fetch_assoc()) {
-    $pdf->Cell(70, 8, utf8_decode($row['nombre']), 1);
-    $pdf->Cell(60, 8, utf8_decode($row['especialidad']), 1);
-    $pdf->Cell(50, 8, $row['dni'], 1);
+    $nombre = strip_tags($row['nombre']);
+    $nombre = preg_replace('/[\x00-\x1F\x7F]/', '', $nombre);
+    $especialidad = strip_tags($row['especialidad']);
+    $especialidad = preg_replace('/[\x00-\x1F\x7F]/', '', $especialidad);
+    $dni = preg_replace('/[^0-9A-Za-z\-]/', '', $row['dni']);
+
+    $pdf->Cell(70, 8, utf8_decode($nombre), 1);
+    $pdf->Cell(60, 8, utf8_decode($especialidad), 1);
+    $pdf->Cell(50, 8, $dni, 1);
     $pdf->Ln();
 }
 

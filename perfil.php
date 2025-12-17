@@ -32,7 +32,7 @@ include __DIR__ . '/includes/header.php';
                                         <?php
                                         $foto = !empty($user['foto']) ? '/admin_php/img/fotos/' . $user['foto'] : '/admin_php/img/undraw_profile.svg';
                                         ?>
-                                        <img id="foto-user-<?= intval($user['id']) ?>" src="<?= $foto ?>" class="rounded-circle mr-4" alt="Foto" style="width:120px;height:120px;object-fit:cover;">
+                                        <img id="foto-user-<?= intval($user['id']) ?>" src="<?= htmlspecialchars($foto, ENT_QUOTES, 'UTF-8') ?>" class="rounded-circle mr-4" alt="Foto" style="width:120px;height:120px;object-fit:cover;">
                                         <div>
                                             <h5 class="mb-0"><?= htmlspecialchars($user['nombre']) ?></h5>
                                             <div class="text-muted"><?= htmlspecialchars($user['email']) ?></div>
@@ -47,8 +47,8 @@ include __DIR__ . '/includes/header.php';
                                     <form class="perfil-form" action="/admin_php/upload.php" method="post" enctype="multipart/form-data" data-user-id="<?= intval($user['id']) ?>">
                                         <input type="hidden" name="id" value="<?= intval($user['id']) ?>">
                                         <div class="form-group">
-                                            <label for="descripcion_<?= $user['id'] ?>">Descripción</label>
-                                            <textarea name="descripcion" id="descripcion_<?= $user['id'] ?>" class="form-control" rows="3"><?= htmlspecialchars($user['descripcion'] ?? '') ?></textarea>
+                                            <label for="descripcion_<?= intval($user['id']) ?>">Descripción</label>
+                                            <textarea name="descripcion" id="descripcion_<?= intval($user['id']) ?>" class="form-control" rows="3"><?= htmlspecialchars($user['descripcion'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
                                         </div>
                                         <div class="form-group">
                                             <label>Foto (opcional)</label>

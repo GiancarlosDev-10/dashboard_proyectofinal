@@ -10,6 +10,11 @@ require(__DIR__ . '/../db.php');
 // ===============================
 $usuario = $_SESSION['admin_name'] ?? 'Usuario';
 $correo  = $_SESSION['admin_email'] ?? 'Correo no disponible';
+// Sanitizar valores para evitar contenido inesperado en el PDF
+$usuario = strip_tags($usuario);
+$usuario = preg_replace('/[\x00-\x1F\x7F]/', '', $usuario);
+$correo = strip_tags($correo);
+$correo = preg_replace('/[\x00-\x1F\x7F]/', '', $correo);
 $fecha   = date('d/m/Y H:i:s');
 
 // ===============================
@@ -78,13 +83,22 @@ $sql = "
 $result = $conn->query($sql);
 
 while ($row = $result->fetch_assoc()) {
-    $pdf->Cell(60, 8, utf8_decode($row['curso']), 1);
-    $pdf->Cell(40, 8, utf8_decode($row['categoria']), 1);
-    $pdf->Cell(35, 8, utf8_decode($row['modalidad']), 1);
-    $pdf->Cell(45, 8, utf8_decode($row['docente']), 1);
+    $curso = strip_tags($row['curso']);
+    $curso = preg_replace('/[\x00-\x1F\x7F]/', '', $curso);
+    $categoria = strip_tags($row['categoria']);
+    $categoria = preg_replace('/[\x00-\x1F\x7F]/', '', $categoria);
+    $modalidad = strip_tags($row['modalidad']);
+    $modalidad = preg_replace('/[\x00-\x1F\x7F]/', '', $modalidad);
+    $docente = strip_tags($row['docente']);
+    $docente = preg_replace('/[\x00-\x1F\x7F]/', '', $docente);
+
+    $pdf->Cell(60, 8, utf8_decode($curso), 1);
+    $pdf->Cell(40, 8, utf8_decode($categoria), 1);
+    $pdf->Cell(35, 8, utf8_decode($modalidad), 1);
+    $pdf->Cell(45, 8, utf8_decode($docente), 1);
     $pdf->Cell(30, 8, $row['fecha_inicio'], 1, 0, 'C');
     $pdf->Cell(25, 8, $row['duracion'] . ' h', 1, 0, 'C');
-    $pdf->Cell(20, 8, $row['cupos'], 1, 1, 'C');
+    $pdf->Cell(20, 8, (int)$row['cupos'], 1, 1, 'C');
 }
 
 // ===============================

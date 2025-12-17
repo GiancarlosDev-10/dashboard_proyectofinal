@@ -8,6 +8,9 @@ require(__DIR__ . '/../vendor/fpdf/fpdf.php');
 // DATOS GENERALES
 // ===============================
 $usuario = $_SESSION['admin_name'] ?? 'Administrador';
+// Sanitizar nombre de usuario para evitar inserción de etiquetas o caracteres de control
+$usuario = strip_tags($usuario);
+$usuario = preg_replace('/[\x00-\x1F\x7F]/', '', $usuario);
 $fecha   = date('d/m/Y H:i:s');
 
 // ===============================

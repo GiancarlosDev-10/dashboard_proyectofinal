@@ -71,21 +71,21 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                     <tbody>
                         <?php while ($row = $result->fetch_assoc()): ?>
                             <tr>
-                                <td><?= $row['id'] ?></td>
-                                <td><?= htmlspecialchars($row['alumno']) ?></td>
-                                <td><?= htmlspecialchars($row['curso']) ?> (S/.<?= number_format($row['precio'], 2) ?>)</td>
-                                <td><?= htmlspecialchars($row['estado']) ?></td>
-                                <td><?= htmlspecialchars($row['fecha_inscripcion']) ?></td>
+                                <td><?= (int)$row['id'] ?></td>
+                                <td><?= htmlspecialchars($row['alumno'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($row['curso'], ENT_QUOTES, 'UTF-8') ?> (S/.<?= number_format($row['precio'], 2) ?>)</td>
+                                <td><?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?></td>
+                                <td><?= htmlspecialchars($row['fecha_inscripcion'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
                                     <!-- EDITAR -->
                                     <button class="btn btn-warning"
                                         data-toggle="modal"
                                         data-target="#editModal"
-                                        data-id="<?= $row['id'] ?>"
-                                        data-alumno="<?= htmlspecialchars($row['alumno']) ?>"
-                                        data-curso="<?= $row['curso_id'] ?>"
-                                        data-fecha="<?= $row['fecha_inscripcion'] ?>"
-                                        data-estado="<?= $row['estado'] ?>">
+                                        data-id="<?= (int)$row['id'] ?>"
+                                        data-alumno="<?= htmlspecialchars($row['alumno'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-curso="<?= (int)$row['curso_id'] ?>"
+                                        data-fecha="<?= htmlspecialchars($row['fecha_inscripcion'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-estado="<?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fa fa-edit"></i> Editar
                                     </button>
 
@@ -93,9 +93,9 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                     <button class="btn btn-danger"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
-                                        data-id="<?= $row['id'] ?>"
-                                        data-alumno="<?= htmlspecialchars($row['alumno']) ?>"
-                                        data-curso="<?= htmlspecialchars($row['curso']) ?>">
+                                        data-id="<?= (int)$row['id'] ?>"
+                                        data-alumno="<?= htmlspecialchars($row['alumno'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-curso="<?= htmlspecialchars($row['curso'], ENT_QUOTES, 'UTF-8') ?>">
                                         <i class="fa fa-trash"></i> Eliminar
                                     </button>
                                 </td>

@@ -127,16 +127,16 @@ include(__DIR__ . '/includes/header.php');
                                     while ($row = $result->fetch_assoc()):
                                     ?>
                                         <tr>
-                                            <td><?= $row['id'] ?></td>
-                                            <td><?= htmlspecialchars($row['nombre']) ?></td>
-                                            <td><?= $row['dni'] ?></td>
-                                            <td><?= htmlspecialchars($row['email']) ?></td>
+                                            <td><?= (int)$row['id'] ?></td>
+                                            <td><?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?></td>
+                                            <td><?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?></td>
+                                            <td><?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?></td>
                                             <td>
                                                 <button class="btn btn-info btn-sm btn-ver-cursos"
-                                                    data-id="<?= $row['id'] ?>"
-                                                    data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
-                                                    data-dni="<?= $row['dni'] ?>"
-                                                    data-email="<?= htmlspecialchars($row['email']) ?>">
+                                                    data-id="<?= (int)$row['id'] ?>"
+                                                    data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                                    data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>"
+                                                    data-email="<?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?>">
                                                     <i class="fas fa-eye"></i> Ver Cursos
                                                 </button>
                                             </td>

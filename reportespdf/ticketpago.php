@@ -40,6 +40,13 @@ if ($resultAlumno->num_rows === 0) {
 }
 
 $alumno = $resultAlumno->fetch_assoc();
+// Sanitizar datos del alumno para evitar inyección o caracteres no deseados
+$alumno['nombre'] = strip_tags($alumno['nombre']);
+$alumno['nombre'] = preg_replace('/[\x00-\x1F\x7F]/', '', $alumno['nombre']);
+$alumno['dni'] = preg_replace('/[^0-9A-Za-z\-]/', '', $alumno['dni']);
+$alumno['email'] = strip_tags($alumno['email']);
+$alumno['email'] = preg_replace('/[\x00-\x1F\x7F]/', '', $alumno['email']);
+$alumno['celular'] = preg_replace('/[^0-9\+\- ]/', '', $alumno['celular']);
 $stmtAlumno->close();
 
 // ============================================
@@ -162,8 +169,13 @@ $pdf->Cell(40, 6, utf8_decode('Precio'), 1, 1, 'R', true);
 // Filas de cursos
 $pdf->SetFont('Arial', '', 9);
 foreach ($cursos as $curso) {
-    $pdf->Cell(90, 6, utf8_decode($curso['nombre']), 1, 0, 'L');
-    $pdf->Cell(50, 6, utf8_decode($curso['modalidad']), 1, 0, 'C');
+    $cursoNombre = strip_tags($curso['nombre']);
+    $cursoNombre = preg_replace('/[\x00-\x1F\x7F]/', '', $cursoNombre);
+    $modalidad = strip_tags($curso['modalidad']);
+    $modalidad = preg_replace('/[\x00-\x1F\x7F]/', '', $modalidad);
+
+    $pdf->Cell(90, 6, utf8_decode($cursoNombre), 1, 0, 'L');
+    $pdf->Cell(50, 6, utf8_decode($modalidad), 1, 0, 'C');
     $pdf->Cell(40, 6, 'S/. ' . number_format((float)$curso['precio'], 2), 1, 1, 'R');
 }
 $pdf->Ln(3);
@@ -226,7 +238,9 @@ $pdf->Cell(0, 4, utf8_decode('Conserve este documento para cualquier reclamo pos
 // ============================================
 // SALIDA DEL PDF
 // ============================================
-$nombreArchivo = 'Ticket_Pago_' . ($alumno['dni'] ?: $alumnoId) . '_' . date('Ymd') . '.pdf';
+$safeDni = $alumno['dni'] ?: $alumnoId;
+$safeDni = preg_replace('/[^0-9A-Za-z\-]/', '', $safeDni);
+$nombreArchivo = 'Ticket_Pago_' . $safeDni . '_' . date('Ymd') . '.pdf';
 // Mostrar en navegador
 $pdf->Output($nombreArchivo, 'I');
 exit;

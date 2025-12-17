@@ -98,7 +98,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                         foreach ($estados as $est):
                                             $sel = (isset($_GET['estado_filter']) && $_GET['estado_filter'] === $est) ? 'selected' : '';
                                         ?>
-                                            <option value="<?= $est ?>" <?= $sel ?>><?= $est ?></option>
+                                            <option value="<?= htmlspecialchars($est, ENT_QUOTES, 'UTF-8') ?>" <?= $sel ?>><?= htmlspecialchars($est, ENT_QUOTES, 'UTF-8') ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
@@ -269,10 +269,10 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                                         data-toggle="modal"
                                                         data-target="#editModal"
                                                         data-id="<?= $row['id'] ?>"
-                                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
-                                                        data-dni="<?= $row['dni'] ?>"
-                                                        data-email="<?= htmlspecialchars($row['email']) ?>"
-                                                        data-celular="<?= $row['celular'] ?>">
+                                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        data-email="<?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        data-celular="<?= htmlspecialchars($row['celular'], ENT_QUOTES, 'UTF-8') ?>">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
 
@@ -281,9 +281,9 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                                         data-toggle="modal"
                                                         data-target="#deleteModal"
                                                         data-id="<?= $row['id'] ?>"
-                                                        data-nombre="<?= htmlspecialchars($row['nombre']) ?>"
-                                                        data-dni="<?= $row['dni'] ?>"
-                                                        data-email="<?= htmlspecialchars($row['email']) ?>">
+                                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        data-email="<?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?>">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
 
@@ -325,7 +325,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                 <ul class="pagination justify-content-center">
                                     <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
                                         <li class="page-item <?= $i == $pagina ? 'active' : '' ?>">
-                                            <a class="page-link" href="indexalumno.php?pagina=<?= $i ?><?= $queryString ?>">
+                                            <a class="page-link" href="indexalumno.php?pagina=<?= $i ?><?= htmlspecialchars($queryString, ENT_QUOTES, 'UTF-8') ?>">
                                                 <?= $i ?>
                                             </a>
                                         </li>
