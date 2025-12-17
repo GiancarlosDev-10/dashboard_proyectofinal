@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['admin_name']  = $data['nombre'];
             $_SESSION['admin_email'] = $data['email'];
             $_SESSION['admin_rol']   = $data['rol'];
+            $_SESSION['admin_foto'] = $data['foto'];
 
             // 5️⃣ Redirigir al dashboard
             header("Location: index2.php");

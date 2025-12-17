@@ -1,5 +1,6 @@
 <?php
 session_start();
+require __DIR__ . '/../../includes/csrf.php';
 include(__DIR__ . '/../../includes/header.php'); ?>
 
 <div id="wrapper">
@@ -272,8 +273,10 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                                         data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
                                                         data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>"
                                                         data-email="<?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?>"
-                                                        data-celular="<?= htmlspecialchars($row['celular'], ENT_QUOTES, 'UTF-8') ?>">
+                                                        data-celular="<?= htmlspecialchars($row['celular'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        aria-label="Editar <?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
                                                         <i class="fa fa-edit"></i>
+                                                        <span class="ml-1">Editar</span>
                                                     </button>
 
                                                     <!-- Botón ELIMINAR -->
@@ -283,8 +286,10 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                                         data-id="<?= $row['id'] ?>"
                                                         data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
                                                         data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>"
-                                                        data-email="<?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?>">
+                                                        data-email="<?= htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') ?>"
+                                                        aria-label="Eliminar <?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
                                                         <i class="fa fa-trash"></i>
+                                                        <span class="ml-1">Eliminar</span>
                                                     </button>
 
                                                 </td>
@@ -534,8 +539,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
 <!-- ========================================================= -->
 <!-- SCRIPTS NECESARIOS                                       -->
 <!-- ========================================================= -->
-<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
-<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts principales cargados desde includes/footer.php (evitar duplicados) -->
 
 <style>
     /* Estilos para campos con error */
@@ -545,256 +549,277 @@ include(__DIR__ . '/../../includes/header.php'); ?>
 </style>
 
 <script>
-    $(document).ready(function() {
-
-        // ============================================
-        // FUNCIONES AUXILIARES PARA VALIDACIONES
-        // ============================================
-
-        function limpiarErrores() {
-            $('.text-danger').hide().text('');
-            $('.form-control').removeClass('is-invalid');
-            $('#successMessage').hide();
-            $('#successMessageEdit').hide();
+    (function() {
+        function whenJQuery(cb) {
+            if (window.jQuery) {
+                cb();
+            } else {
+                setTimeout(function() {
+                    whenJQuery(cb);
+                }, 50);
+            }
         }
 
-        function mostrarErrores(errores, prefijo = '') {
-            $.each(errores, function(campo, mensaje) {
-                $('#error-' + prefijo + campo).text('⚠️ ' + mensaje).show();
-                $('#' + prefijo + campo).addClass('is-invalid');
-            });
-        }
+        whenJQuery(function() {
+            $(document).ready(function() {
+                try {
 
-        // Limpiar error cuando el usuario escribe en AGREGAR
-        $('#formAgregarAlumno input').on('input', function() {
-            const campo = $(this).attr('id');
-            $('#error-' + campo).hide();
-            $(this).removeClass('is-invalid');
-        });
+                    // ============================================
+                    // FUNCIONES AUXILIARES PARA VALIDACIONES
+                    // ============================================
 
-        // Limpiar error cuando el usuario escribe en EDITAR
-        $('#formEditarAlumno input').on('input', function() {
-            const campo = $(this).attr('id');
-            $('#error-' + campo).hide();
-            $(this).removeClass('is-invalid');
-        });
-
-        // ============================================
-        // EVENTO REGISTRAR ALUMNO CON AJAX
-        // ============================================
-
-        $('#btnRegistrar').click(function() {
-            limpiarErrores();
-
-            const formData = {
-                csrf_token: $('input[name="csrf_token"]').val(),
-                nombre: $('#nombre').val().trim(),
-                dni: $('#dni').val().trim(),
-                email: $('#email').val().trim(),
-                celular: $('#celular').val().trim()
-            };
-
-            // Deshabilitar botón mientras procesa
-            $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Registrando...');
-
-            $.ajax({
-                url: 'addalumno.php',
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        // Mostrar mensaje de éxito
-                        $('#successMessage').show();
-                        $('#formAgregarAlumno')[0].reset();
-
-                        // Recargar página después de 1.5 segundos
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-
-                    } else {
-                        // Mostrar errores debajo de cada campo
-                        mostrarErrores(response.errors);
-                        $('#btnRegistrar').prop('disabled', false).html('Registrar alumno');
+                    function limpiarErrores() {
+                        $('.text-danger').hide().text('');
+                        $('.form-control').removeClass('is-invalid');
+                        $('#successMessage').hide();
+                        $('#successMessageEdit').hide();
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX:', error);
-                    alert('Error de conexión. Por favor, intenta nuevamente.');
-                    $('#btnRegistrar').prop('disabled', false).html('Registrar alumno');
-                }
-            });
-        });
 
-        // ============================================
-        // EVENTO GUARDAR CAMBIOS (EDITAR) CON AJAX
-        // ============================================
-
-        $('#btnGuardarCambios').click(function() {
-            limpiarErrores();
-
-            const formData = {
-                csrf_token: $('#formEditarAlumno input[name="csrf_token"]').val(),
-                id: $('#edit-id').val(),
-                nombre: $('#edit-nombre').val().trim(),
-                dni: $('#edit-dni').val().trim(),
-                email: $('#edit-email').val().trim(),
-                celular: $('#edit-celular').val().trim()
-            };
-
-            // Deshabilitar botón mientras procesa
-            $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
-
-            $.ajax({
-                url: 'editaralumno.php',
-                type: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        // Mostrar mensaje de éxito
-                        $('#successMessageEdit').show();
-
-                        // Recargar página después de 1.5 segundos
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
-
-                    } else {
-                        // Mostrar errores debajo de cada campo
-                        mostrarErrores(response.errors, 'edit-');
-                        $('#btnGuardarCambios').prop('disabled', false).html('Guardar cambios');
+                    function mostrarErrores(errores, prefijo = '') {
+                        $.each(errores, function(campo, mensaje) {
+                            $('#error-' + prefijo + campo).text('⚠️ ' + mensaje).show();
+                            $('#' + prefijo + campo).addClass('is-invalid');
+                        });
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX:', error);
-                    alert('Error de conexión. Por favor, intenta nuevamente.');
-                    $('#btnGuardarCambios').prop('disabled', false).html('Guardar cambios');
-                }
-            });
-        });
 
-        // ============================================
-        // MODAL ELIMINAR - CARGAR DATOS
-        // ============================================
+                    // Limpiar error cuando el usuario escribe en AGREGAR
+                    $('#formAgregarAlumno input').on('input', function() {
+                        const campo = $(this).attr('id');
+                        $('#error-' + campo).hide();
+                        $(this).removeClass('is-invalid');
+                    });
 
-        $('#deleteModal').on('show.bs.modal', function(event) {
-            const button = $(event.relatedTarget);
-            $('#delete-alumno-id').val(button.data('id'));
-            $('#delete-alumno-nombre').text(button.data('nombre'));
-            $('#delete-alumno-dni').text(button.data('dni'));
-            $('#delete-alumno-email').text(button.data('email'));
-        });
+                    // Limpiar error cuando el usuario escribe en EDITAR
+                    $('#formEditarAlumno input').on('input', function() {
+                        const campo = $(this).attr('id');
+                        $('#error-' + campo).hide();
+                        $(this).removeClass('is-invalid');
+                    });
 
-        // ============================================
-        // EVENTO CONFIRMAR ELIMINACIÓN CON AJAX
-        // ============================================
+                    // ============================================
+                    // EVENTO REGISTRAR ALUMNO CON AJAX
+                    // ============================================
 
-        $('#btnConfirmarEliminar').click(function() {
+                    $('#btnRegistrar').click(function() {
+                        limpiarErrores();
 
-            const id = $('#delete-alumno-id').val();
-            const nombre = $('#delete-alumno-nombre').text();
+                        const formData = {
+                            csrf_token: $('input[name="csrf_token"]').val(),
+                            nombre: $('#nombre').val().trim(),
+                            dni: $('#dni').val().trim(),
+                            email: $('#email').val().trim(),
+                            celular: $('#celular').val().trim()
+                        };
 
-            // Deshabilitar botón mientras procesa
-            $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Eliminando...');
+                        // Deshabilitar botón mientras procesa
+                        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Registrando...');
 
-            $.ajax({
-                url: 'deletealumno.php',
-                type: 'POST',
-                data: {
-                    id: id
-                },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        // Cerrar modal
-                        $('#deleteModal').modal('hide');
+                        $.ajax({
+                            url: 'addalumno.php',
+                            type: 'POST',
+                            data: formData,
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    // Mostrar mensaje de éxito
+                                    $('#successMessage').show();
+                                    $('#formAgregarAlumno')[0].reset();
 
-                        // Mostrar alerta de éxito
-                        const alertHtml = `
+                                    // Recargar página después de 1.5 segundos
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 1500);
+
+                                } else {
+                                    // Mostrar errores debajo de cada campo
+                                    mostrarErrores(response.errors);
+                                    $('#btnRegistrar').prop('disabled', false).html('Registrar alumno');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error AJAX:', error);
+                                alert('Error de conexión. Por favor, intenta nuevamente.');
+                                $('#btnRegistrar').prop('disabled', false).html('Registrar alumno');
+                            }
+                        });
+                    });
+
+                    // ============================================
+                    // EVENTO GUARDAR CAMBIOS (EDITAR) CON AJAX
+                    // ============================================
+
+                    $('#btnGuardarCambios').click(function() {
+                        limpiarErrores();
+
+                        const formData = {
+                            csrf_token: $('#formEditarAlumno input[name="csrf_token"]').val(),
+                            id: $('#edit-id').val(),
+                            nombre: $('#edit-nombre').val().trim(),
+                            dni: $('#edit-dni').val().trim(),
+                            email: $('#edit-email').val().trim(),
+                            celular: $('#edit-celular').val().trim()
+                        };
+
+                        // Deshabilitar botón mientras procesa
+                        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+                        $.ajax({
+                            url: 'editaralumno.php',
+                            type: 'POST',
+                            data: formData,
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    // Mostrar mensaje de éxito
+                                    $('#successMessageEdit').show();
+
+                                    // Recargar página después de 1.5 segundos
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 1500);
+
+                                } else {
+                                    // Mostrar errores debajo de cada campo
+                                    mostrarErrores(response.errors, 'edit-');
+                                    $('#btnGuardarCambios').prop('disabled', false).html('Guardar cambios');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error AJAX:', error);
+                                alert('Error de conexión. Por favor, intenta nuevamente.');
+                                $('#btnGuardarCambios').prop('disabled', false).html('Guardar cambios');
+                            }
+                        });
+                    });
+
+                    // ============================================
+                    // MODAL ELIMINAR - CARGAR DATOS
+                    // ============================================
+
+                    $('#deleteModal').on('show.bs.modal', function(event) {
+                        const button = $(event.relatedTarget);
+                        $('#delete-alumno-id').val(button.data('id'));
+                        $('#delete-alumno-nombre').text(button.data('nombre'));
+                        $('#delete-alumno-dni').text(button.data('dni'));
+                        $('#delete-alumno-email').text(button.data('email'));
+                    });
+
+                    // ============================================
+                    // EVENTO CONFIRMAR ELIMINACIÓN CON AJAX
+                    // ============================================
+
+                    $('#btnConfirmarEliminar').click(function() {
+
+                        const id = $('#delete-alumno-id').val();
+                        const nombre = $('#delete-alumno-nombre').text();
+
+                        // Deshabilitar botón mientras procesa
+                        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Eliminando...');
+
+                        $.ajax({
+                            url: 'deletealumno.php',
+                            type: 'POST',
+                            data: {
+                                id: id
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.success) {
+                                    // Cerrar modal
+                                    $('#deleteModal').modal('hide');
+
+                                    // Mostrar alerta de éxito
+                                    const alertHtml = `
                                             <div class="alert alert-success alert-dismissible fade show" role="alert">
                                                 <i class="fa fa-check-circle"></i> ${response.message}
                                                 <button type="button" class="close" data-dismiss="alert">&times;</button>
                                             </div>
                                         `;
-                        $('.container.mt-4').prepend(alertHtml);
+                                    $('.container.mt-4').prepend(alertHtml);
 
-                        // Recargar página después de 1.5 segundos
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1500);
+                                    // Recargar página después de 1.5 segundos
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 1500);
 
-                    } else {
-                        // Cerrar modal
-                        $('#deleteModal').modal('hide');
+                                } else {
+                                    // Cerrar modal
+                                    $('#deleteModal').modal('hide');
 
-                        // Mostrar alerta de error
-                        const alertHtml = `
+                                    // Mostrar alerta de error
+                                    const alertHtml = `
                                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                                 <i class="fa fa-exclamation-triangle"></i> ${response.message}
                                                 <button type="button" class="close" data-dismiss="alert">&times;</button>
                                             </div>
                                         `;
-                        $('.container.mt-4').prepend(alertHtml);
+                                    $('.container.mt-4').prepend(alertHtml);
 
+                                    $('#btnConfirmarEliminar').prop('disabled', false).html('<i class="fa fa-trash"></i> Sí, eliminar');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error AJAX:', error);
+                                $('#deleteModal').modal('hide');
+                                alert('Error de conexión. Por favor, intenta nuevamente.');
+                                $('#btnConfirmarEliminar').prop('disabled', false).html('<i class="fa fa-trash"></i> Sí, eliminar');
+                            }
+                        });
+                    });
+
+                    // Resetear botón al cerrar modal
+                    $('#deleteModal').on('hidden.bs.modal', function() {
                         $('#btnConfirmarEliminar').prop('disabled', false).html('<i class="fa fa-trash"></i> Sí, eliminar');
+                    });
+
+                    // ============================================
+                    // LIMPIAR AL CERRAR MODALES
+                    // ============================================
+
+                    $('#addModal').on('hidden.bs.modal', function() {
+                        $('#formAgregarAlumno')[0].reset();
+                        limpiarErrores();
+                        $('#btnRegistrar').prop('disabled', false).html('Registrar alumno');
+                    });
+
+                    $('#editModal').on('hidden.bs.modal', function() {
+                        limpiarErrores();
+                        $('#btnGuardarCambios').prop('disabled', false).html('Guardar cambios');
+                    });
+
+                    // ============================================
+                    // MODAL EDITAR - CARGAR DATOS
+                    // ============================================
+
+                    $('#editModal').on('show.bs.modal', function(event) {
+                        const button = $(event.relatedTarget);
+                        $('#edit-id').val(button.data('id'));
+                        $('#edit-nombre').val(button.data('nombre'));
+                        $('#edit-dni').val(button.data('dni'));
+                        $('#edit-email').val(button.data('email'));
+                        $('#edit-celular').val(button.data('celular'));
+                    });
+
+                    // ============================================
+                    // BUSCADOR EN TABLA (cliente) - conserva comportamiento previo
+                    // ============================================
+
+                    var busquedaEl = document.getElementById('busqueda');
+                    if (busquedaEl) {
+                        busquedaEl.addEventListener('input', function() {
+                            const filtro = this.value.toLowerCase();
+                            document.querySelectorAll('table tbody tr').forEach(fila => {
+                                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? '' : 'none';
+                            });
+                        });
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error AJAX:', error);
-                    $('#deleteModal').modal('hide');
-                    alert('Error de conexión. Por favor, intenta nuevamente.');
-                    $('#btnConfirmarEliminar').prop('disabled', false).html('<i class="fa fa-trash"></i> Sí, eliminar');
+
+                } catch (e) {
+                    console.error('Error en scripts de indexalumno.php:', e);
                 }
             });
         });
-
-        // Resetear botón al cerrar modal
-        $('#deleteModal').on('hidden.bs.modal', function() {
-            $('#btnConfirmarEliminar').prop('disabled', false).html('<i class="fa fa-trash"></i> Sí, eliminar');
-        });
-
-        // ============================================
-        // LIMPIAR AL CERRAR MODALES
-        // ============================================
-
-        $('#addModal').on('hidden.bs.modal', function() {
-            $('#formAgregarAlumno')[0].reset();
-            limpiarErrores();
-            $('#btnRegistrar').prop('disabled', false).html('Registrar alumno');
-        });
-
-        $('#editModal').on('hidden.bs.modal', function() {
-            limpiarErrores();
-            $('#btnGuardarCambios').prop('disabled', false).html('Guardar cambios');
-        });
-
-        // ============================================
-        // MODAL EDITAR - CARGAR DATOS
-        // ============================================
-
-        $('#editModal').on('show.bs.modal', function(event) {
-            const button = $(event.relatedTarget);
-            $('#edit-id').val(button.data('id'));
-            $('#edit-nombre').val(button.data('nombre'));
-            $('#edit-dni').val(button.data('dni'));
-            $('#edit-email').val(button.data('email'));
-            $('#edit-celular').val(button.data('celular'));
-        });
-
-        // ============================================
-        // BUSCADOR EN TABLA (cliente) - conserva comportamiento previo
-        // ============================================
-
-        document.getElementById('busqueda').addEventListener('input', function() {
-            const filtro = this.value.toLowerCase();
-            document.querySelectorAll('table tbody tr').forEach(fila => {
-                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? '' : 'none';
-            });
-        });
-
-    });
+    })();
 </script>
 
 <?php include(__DIR__ . '/../../includes/footer.php'); ?>
