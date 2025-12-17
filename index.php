@@ -1,9 +1,13 @@
 <?php
 session_start();
+require 'includes/csrf.php';
 require 'db.php';
 
 // Si el usuario ya está logueado, redirigir al dashboard
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // VALIDAR CSRF PRIMERO
+    verificar_csrf_o_morir();
 
     // Sanitizar entradas
     $email    = trim($_POST['email'] ?? '');
@@ -136,6 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 <label class="custom-control-label" for="customCheck">Recordarme</label>
                                             </div>
                                         </div>
+
+                                        <!-- Token CSRF -->
+                                        <?= csrf_input() ?>
 
                                         <!-- BOTÓN DE LOGIN -->
                                         <button type="submit" class="btn btn-primary btn-user btn-block">

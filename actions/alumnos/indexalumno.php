@@ -363,6 +363,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 </div>
 
                 <form id="formEditarAlumno">
+                    <!-- Token CSRF -->
+                    <?= csrf_input() ?>
 
                     <!-- ID oculto -->
                     <input type="hidden" name="id" id="edit-id">
@@ -429,6 +431,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 </div>
 
                 <form id="formAgregarAlumno">
+                    <!-- Token CSRF -->
+                    <?= csrf_input() ?>
 
                     <!-- Nombre -->
                     <div class="mb-3">
@@ -583,6 +587,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
             limpiarErrores();
 
             const formData = {
+                csrf_token: $('input[name="csrf_token"]').val(),
                 nombre: $('#nombre').val().trim(),
                 dni: $('#dni').val().trim(),
                 email: $('#email').val().trim(),
@@ -630,6 +635,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
             limpiarErrores();
 
             const formData = {
+                csrf_token: $('#formEditarAlumno input[name="csrf_token"]').val(),
                 id: $('#edit-id').val(),
                 nombre: $('#edit-nombre').val().trim(),
                 dni: $('#edit-dni').val().trim(),
