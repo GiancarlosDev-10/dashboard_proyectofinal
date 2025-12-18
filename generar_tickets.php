@@ -67,6 +67,59 @@ if (isset($_GET['obtener_cursos_ajax'])) {
     exit;
 }
 
+// ============================================
+// AJAX: GUARDAR PAGO ANTES DE GENERAR PDF
+// ============================================
+if (isset($_POST['guardar_pago_ajax'])) {
+    header('Content-Type: application/json');
+
+    $alumnoId = intval($_POST['alumno_id'] ?? 0);
+    $total = floatval($_POST['total'] ?? 0);
+    $response = ['success' => false, 'message' => '', 'numero_ticket' => ''];
+
+    if ($alumnoId > 0 && $total > 0) {
+        try {
+            // Generar número de ticket único
+            $sqlUltimo = "SELECT numero_ticket FROM pagos ORDER BY id DESC LIMIT 1";
+            $resultUltimo = $conn->query($sqlUltimo);
+
+            if ($resultUltimo && $resultUltimo->num_rows > 0) {
+                $ultimo = $resultUltimo->fetch_assoc()['numero_ticket'];
+                $numero = intval(str_replace('T-', '', $ultimo)) + 1;
+            } else {
+                $numero = 1;
+            }
+
+            $numeroTicket = 'T-' . str_pad($numero, 3, '0', STR_PAD_LEFT);
+
+            // Insertar en tabla pagos
+            $sqlInsert = "INSERT INTO pagos (alumno_id, numero_ticket, total, estado) 
+                          VALUES (?, ?, ?, 'Pendiente')";
+            $stmtInsert = $conn->prepare($sqlInsert);
+            $stmtInsert->bind_param("isd", $alumnoId, $numeroTicket, $total);
+
+            if ($stmtInsert->execute()) {
+                $response['success'] = true;
+                $response['numero_ticket'] = $numeroTicket;
+                $response['message'] = 'Pago registrado correctamente';
+            } else {
+                $response['message'] = 'Error al guardar el pago';
+            }
+
+            $stmtInsert->close();
+        } catch (Exception $e) {
+            error_log("Error al guardar pago: " . $e->getMessage());
+            $response['message'] = 'Error al procesar el pago.';
+        }
+    } else {
+        $response['message'] = 'Datos inválidos';
+    }
+
+    $conn->close();
+    echo json_encode($response);
+    exit;
+}
+
 include(__DIR__ . '/includes/header.php');
 ?>
 
@@ -244,11 +297,6 @@ include(__DIR__ . '/includes/header.php');
     </div>
 </div>
 
-<!-- ========================================================= -->
-<!-- SCRIPTS NECESARIOS                                       -->
-<!-- ========================================================= -->
-<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
-<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $(document).ready(function() {
@@ -336,11 +384,48 @@ include(__DIR__ . '/includes/header.php');
         // ============================================
         // GENERAR TICKET PDF
         // ============================================
+        // ============================================
+        // GENERAR TICKET PDF (CON REGISTRO EN BD)
+        // ============================================
         $('#btn-generar-ticket').click(function() {
             const alumnoId = $('#modal-alumno-id').val();
-            window.open('reportespdf/ticketpago.php?alumno_id=' + alumnoId, '_blank');
-        });
+            const total = parseFloat($('#total-footer').text());
 
+            // Deshabilitar botón mientras procesa
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+            // Primero guardar el pago en la BD
+            $.ajax({
+                url: 'generar_tickets.php',
+                type: 'POST',
+                data: {
+                    guardar_pago_ajax: 1,
+                    alumno_id: alumnoId,
+                    total: total
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // Ahora sí generar el PDF con el número de ticket
+                        window.open('reportespdf/ticketpago.php?alumno_id=' + alumnoId + '&ticket=' + response.numero_ticket, '_blank');
+
+                        // Cerrar modal y mostrar mensaje
+                        $('#cursosModal').modal('hide');
+                        alert('✅ Ticket ' + response.numero_ticket + ' generado correctamente');
+
+                        // Recargar página para actualizar tabla
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        alert('❌ Error: ' + response.message);
+                        $('#btn-generar-ticket').prop('disabled', false).html('<i class="fas fa-file-pdf"></i> Generar Ticket de Pago');
+                    }
+                },
+                error: function() {
+                    alert('❌ Error de conexión al guardar el pago');
+                    $('#btn-generar-ticket').prop('disabled', false).html('<i class="fas fa-file-pdf"></i> Generar Ticket de Pago');
+                }
+            });
+        });
     });
 </script>
 

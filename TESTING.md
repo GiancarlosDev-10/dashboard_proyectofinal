@@ -597,6 +597,118 @@
 - ✅ Mensaje de error claro (no exposición de datos sensibles)
 - ✅ Log de error registrado
 
+---
+
+### **Prueba 34: Sistema de Historial de Pagos - Generar y registrar ticket**
+
+**Objetivo:** Verificar que al generar un ticket se registre en la tabla `pagos`
+
+**Pasos:**
+
+1. Iniciar sesión como admin
+2. Ir a "Generar Tickets"
+3. Buscar un alumno con cursos matriculados
+4. Clic en "Ver Cursos"
+5. Clic en "Generar Ticket de Pago"
+
+**Resultado esperado:**
+
+- ✅ Se genera el PDF con número de ticket único (T-001, T-002...)
+- ✅ Se guarda registro en tabla `pagos` con estado "Pendiente"
+- ✅ Se muestra mensaje de confirmación
+- ✅ Se cierra el modal automáticamente
+
+---
+
+### **Prueba 35: Historial de Pagos - Visualizar y filtrar tickets**
+
+**Objetivo:** Verificar que se muestren todos los tickets generados
+
+**Pasos:**
+
+1. Ir a "Historial de Pagos" en el sidebar
+2. Verificar que aparezcan los tickets generados
+3. Usar el buscador para filtrar por número de ticket o nombre de alumno
+
+**Resultado esperado:**
+
+- ✅ Tabla muestra: Nº Ticket, Alumno, Total, Fecha, Estado
+- ✅ Badge amarillo para "Pendiente", verde para "Pagado"
+- ✅ Búsqueda en tiempo real funciona correctamente
+- ✅ Paginación si hay más de 10 registros
+
+---
+
+### **Prueba 36: Historial de Pagos - Marcar como pagado**
+
+**Objetivo:** Verificar que se pueda cambiar el estado de un ticket
+
+**Pasos:**
+
+1. En "Historial de Pagos", ubicar un ticket con estado "Pendiente"
+2. Clic en "Marcar como Pagado"
+3. Confirmar en el modal
+
+**Resultado esperado:**
+
+- ✅ El estado cambia de "Pendiente" a "Pagado"
+- ✅ El badge cambia de amarillo a verde
+- ✅ El botón "Marcar como Pagado" desaparece
+- ✅ Se muestra mensaje de éxito
+
+---
+
+### **Prueba 37: Historial de Pagos - Re-imprimir ticket**
+
+**Objetivo:** Verificar que se pueda volver a generar el PDF de un ticket
+
+**Pasos:**
+
+1. En "Historial de Pagos", clic en "Re-imprimir" en cualquier ticket
+2. Verificar que se abra el PDF
+
+**Resultado esperado:**
+
+- ✅ Se abre el PDF con el mismo número de ticket
+- ✅ Los datos del alumno y cursos son correctos
+- ✅ El total coincide con el registrado
+
+---
+
+### **Prueba 38: Validación de Roles - Alumno no puede modificar cursos/docentes**
+
+**Objetivo:** Verificar que alumnos no vean botones de edición
+
+**Pasos:**
+
+1. Iniciar sesión como alumno (`alumno@cersa.com` / `alumno123`)
+2. Ir a "Cursos"
+3. Ir a "Docentes"
+
+**Resultado esperado:**
+
+- ✅ NO aparece botón "Agregar curso" / "Agregar docente"
+- ✅ En la columna "Acciones" aparece badge "Solo lectura"
+- ✅ NO aparecen botones "Editar" ni "Eliminar"
+- ✅ La tabla es de solo lectura
+
+---
+
+### **Prueba 39: Validación de Roles - Admin tiene acceso completo**
+
+**Objetivo:** Verificar que admin vea todos los botones
+
+**Pasos:**
+
+1. Iniciar sesión como admin (`giancarlos@cersa.com` / `admin123`)
+2. Ir a "Cursos" y "Docentes"
+
+**Resultado esperado:**
+
+- ✅ Aparece botón "Agregar"
+- ✅ Aparecen botones "Editar" y "Eliminar" en cada fila
+- ✅ Puede ejecutar todas las acciones sin restricciones
+
 ## 📊 Resumen de Pruebas
 
 | Categoría          | Pruebas | Estado |
@@ -611,13 +723,14 @@
 | Paginación         | 1       | ✅     |
 | Reportes PDF       | 2       | ✅     |
 | Subida de archivos | 2       | ✅     |
-| Roles y Permisos   | 2       | ✅     |
+| Roles y Permisos   | 4       | ✅     |
 | Dashboard          | 2       | ✅     |
 | Relaciones         | 2       | ✅     |
 | Seguridad          | 2       | ✅     |
 | Manejo de Errores  | 2       | ✅     |
+| Sistema de Pagos   | 4       | ✅     |
 | Logout             | 1       | ✅     |
-| **TOTAL**          | **33**  | ✅     |
+| **TOTAL**          | **39**  | ✅     |
 
 ## ✅ Validación Final
 

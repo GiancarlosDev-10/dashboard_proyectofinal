@@ -190,7 +190,7 @@
                     Registro de Actividad
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="logout.php" onclick="return confirm('¿Estás seguro de que quieres cerrar sesión?');">
+                <a class="dropdown-item" href="/admin_php/logout.php" onclick="return confirm('¿Estás seguro de que quieres cerrar sesión?');">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     Cerrar Sesión
                 </a>

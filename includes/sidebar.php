@@ -149,9 +149,9 @@ $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
 
         <!-- Nav Item - Almacenar Recibos (SOLO ADMIN) -->
         <li class="nav-item">
-            <a class="nav-link" href="tables.html">
+            <a class="nav-link" href="/admin_php/actions/pagos/historial_pagos.php">
                 <i class="fas fa-fw fa-table"></i>
-                <span>Almacenar Recibos</span></a>
+                <span>Historial de Pagos</span></a>
         </li>
 
     <?php else: ?>
