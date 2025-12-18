@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 1️⃣ Buscar usuario SOLO por email
-    $sql = "SELECT id, nombre, email, password, rol FROM admin WHERE email = ?";
+    $sql = "SELECT id, nombre, email, password, rol, foto FROM admin WHERE email = ?";
     $stmt = $conn->prepare($sql);
 
     if (!$stmt) {

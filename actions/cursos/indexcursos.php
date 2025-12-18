@@ -1,5 +1,6 @@
 <?php
 session_start();
+require __DIR__ . '/../../includes/csrf.php';
 include(__DIR__ . '/../../includes/header.php'); ?>
 
 <div id="wrapper">
@@ -27,9 +28,15 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="text-primary mb-0">Lista de Cursos</h3>
 
-                    <button class="btn btn-success" data-toggle="modal" data-target="#addModal">
-                        <i class="fa fa-plus"></i> Agregar curso
-                    </button>
+                    <?php
+                    $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
+                    ?>
+
+                    <?php if ($rol_usuario === 'admin'): ?>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#addModal">
+                            <i class="fa fa-plus"></i> Agregar curso
+                        </button>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Buscador -->
@@ -76,6 +83,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                             <th>Precio</th>
                             <th>Estado</th>
                             <th>Acciones</th>
+
                         </tr>
                     </thead>
 
@@ -91,29 +99,33 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                 <td>S/. <?= number_format((float)$row['precio'], 2) ?></td>
                                 <td><?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
-                                    <!-- EDITAR -->
-                                    <button class="btn btn-warning btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
-                                        data-id="<?= $row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-categoria="<?= (int)$row['categoria_id'] ?>"
-                                        data-modalidad="<?= (int)$row['modalidad_id'] ?>"
-                                        data-fecha="<?= htmlspecialchars($row['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-cupos="<?= (int)$row['cupos'] ?>"
-                                        data-precio="<?= htmlspecialchars($row['precio'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-estado="<?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?>">
-                                        <i class="fa fa-edit"></i> Editar
-                                    </button>
+                                    <?php if ($rol_usuario === 'admin'): ?>
+                                        <!-- EDITAR -->
+                                        <button class="btn btn-warning btn-sm"
+                                            data-toggle="modal"
+                                            data-target="#editModal"
+                                            data-id="<?= $row['id'] ?>"
+                                            data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-categoria="<?= (int)$row['categoria_id'] ?>"
+                                            data-modalidad="<?= (int)$row['modalidad_id'] ?>"
+                                            data-fecha="<?= htmlspecialchars($row['fecha_inicio'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-cupos="<?= (int)$row['cupos'] ?>"
+                                            data-precio="<?= htmlspecialchars($row['precio'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-estado="<?= htmlspecialchars($row['estado'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <i class="fa fa-edit"></i> Editar
+                                        </button>
 
-                                    <!-- ELIMINAR -->
-                                    <button class="btn btn-danger btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="<?= (int)$row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
-                                        <i class="fa fa-trash"></i> Eliminar
-                                    </button>
+                                        <!-- ELIMINAR -->
+                                        <button class="btn btn-danger btn-sm"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="<?= (int)$row['id'] ?>"
+                                            data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <i class="fa fa-trash"></i> Eliminar
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="badge badge-secondary">Solo lectura</span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -363,8 +375,6 @@ include(__DIR__ . '/../../includes/header.php'); ?>
 <!-- ========================================================= -->
 <!-- SCRIPTS -->
 <!-- ========================================================= -->
-<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
-<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <style>
     .form-control.is-invalid {

@@ -66,7 +66,9 @@ $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Nueva Acción</h6>
                 <a class="collapse-item" href="/admin_php/actions/cursos/indexcursos.php">Ver Cursos</a>
-                <a class="collapse-item" href="/admin_php/actions/cursos/reportecursos.php">Reporte General</a>
+                <?php if ($rol_usuario === 'admin'): ?>
+                    <a class="collapse-item" href="/admin_php/actions/cursos/reportecursos.php">Reporte General</a>
+                <?php endif; ?>
             </div>
         </div>
     </li>
@@ -83,7 +85,9 @@ $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Nueva Acción</h6>
                 <a class="collapse-item" href="/admin_php/actions/docentes/indexdocentes.php">Ver Docentes</a>
-                <a class="collapse-item" href="/admin_php/actions/docentes/reportedocentes.php">Reporte General</a>
+                <?php if ($rol_usuario === 'admin'): ?>
+                    <a class="collapse-item" href="/admin_php/actions/docentes/reportedocentes.php">Reporte General</a>
+                <?php endif; ?>
             </div>
         </div>
     </li>
@@ -115,8 +119,10 @@ $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
         Resumen de reportes
     </div>
 
-    <!-- Nav Item - Reportes PDF (SOLO ADMIN) -->
+    <!-- SECCIÓN PARA ADMIN -->
     <?php if ($rol_usuario === 'admin'): ?>
+
+        <!-- Nav Item - Reportes PDF (SOLO ADMIN) -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseReportes"
                 aria-expanded="true" aria-controls="collapseReportes">
@@ -147,6 +153,17 @@ $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
                 <i class="fas fa-fw fa-table"></i>
                 <span>Almacenar Recibos</span></a>
         </li>
+
+    <?php else: ?>
+
+        <!-- SECCIÓN PARA ALUMNO: Solo Generar Tickets -->
+        <li class="nav-item">
+            <a class="nav-link" href="/admin_php/generar_tickets.php">
+                <i class="fas fa-fw fa-ticket-alt"></i>
+                <span>Generar Tickets</span>
+            </a>
+        </li>
+
     <?php endif; ?>
 
     <!-- Divider -->

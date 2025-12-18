@@ -1,5 +1,6 @@
 <?php
 session_start();
+require __DIR__ . '/../../includes/csrf.php';
 include(__DIR__ . '/../../includes/header.php'); ?>
 
 <div id="wrapper">
@@ -16,9 +17,14 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="text-primary mb-0">Lista de Docentes</h3>
 
-                    <button class="btn btn-success" data-toggle="modal" data-target="#addModal">
-                        <i class="fa fa-plus"></i> Agregar docente
-                    </button>
+                    <?php
+                    $rol_usuario = $_SESSION['admin_rol'] ?? 'alumno';
+                    ?>
+                    <?php if ($rol_usuario === 'admin'): ?>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#addModal">
+                            <i class="fa fa-plus"></i> Agregar docente
+                        </button>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Buscador -->
@@ -59,25 +65,29 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                                 <td><?= htmlspecialchars($row['especialidad'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td><?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?></td>
                                 <td>
-                                    <!-- BOTÓN EDITAR -->
-                                    <button class="btn btn-warning"
-                                        data-toggle="modal"
-                                        data-target="#editModal"
-                                        data-id="<?= (int)$row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-especialidad="<?= htmlspecialchars($row['especialidad'], ENT_QUOTES, 'UTF-8') ?>"
-                                        data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>">
-                                        <i class="fa fa-edit"></i> Editar
-                                    </button>
+                                    <?php if ($rol_usuario === 'admin'): ?>
+                                        <!-- BOTÓN EDITAR -->
+                                        <button class="btn btn-warning"
+                                            data-toggle="modal"
+                                            data-target="#editModal"
+                                            data-id="<?= (int)$row['id'] ?>"
+                                            data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-especialidad="<?= htmlspecialchars($row['especialidad'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-dni="<?= htmlspecialchars($row['dni'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <i class="fa fa-edit"></i> Editar
+                                        </button>
 
-                                    <!-- BOTÓN ELIMINAR -->
-                                    <button class="btn btn-danger"
-                                        data-toggle="modal"
-                                        data-target="#deleteModal"
-                                        data-id="<?= (int)$row['id'] ?>"
-                                        data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
-                                        <i class="fa fa-trash"></i> Eliminar
-                                    </button>
+                                        <!-- BOTÓN ELIMINAR -->
+                                        <button class="btn btn-danger"
+                                            data-toggle="modal"
+                                            data-target="#deleteModal"
+                                            data-id="<?= (int)$row['id'] ?>"
+                                            data-nombre="<?= htmlspecialchars($row['nombre'], ENT_QUOTES, 'UTF-8') ?>">
+                                            <i class="fa fa-trash"></i> Eliminar
+                                        </button>
+                                    <?php else: ?>
+                                        <span class="badge badge-secondary">Solo lectura</span>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -229,9 +239,6 @@ include(__DIR__ . '/../../includes/header.php'); ?>
         </div>
     </div>
 </div>
-
-<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
-<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $(document).ready(function() {

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * GENERAR TICKET DE PAGO EN PDF (USANDO FPDF)
- * Muestra los cursos matriculados del alumno y el total a pagar
- *
- * Ajusta la ruta a la librería FPDF si tu estructura difiere.
- */
-
 require_once("../db.php");
 
 // Ruta a la librería FPDF (ajusta si tu ruta es distinta)
@@ -53,10 +46,10 @@ $stmtAlumno->close();
 // OBTENER CURSOS MATRICULADOS
 // ============================================
 $sqlCursos = "SELECT c.nombre, c.precio, m.nombre as modalidad, c.duracion
-              FROM matricula mat
-              INNER JOIN curso c ON mat.curso_id = c.id
-              INNER JOIN modalidad m ON c.modalidad_id = m.id
-              WHERE mat.alumno_id = ?";
+            FROM matricula mat
+            INNER JOIN curso c ON mat.curso_id = c.id
+            INNER JOIN modalidad m ON c.modalidad_id = m.id
+            WHERE mat.alumno_id = ?";
 
 $stmtCursos = $conn->prepare($sqlCursos);
 if (!$stmtCursos) {

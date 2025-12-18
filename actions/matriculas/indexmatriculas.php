@@ -1,5 +1,6 @@
 <?php
 session_start();
+require __DIR__ . '/../../includes/csrf.php';
 include(__DIR__ . '/../../includes/header.php'); ?>
 
 <div id="wrapper">
@@ -285,9 +286,6 @@ include(__DIR__ . '/../../includes/header.php'); ?>
         </div>
     </div>
 </div>
-
-<script src="/admin_php/vendor/jquery/jquery.min.js"></script>
-<script src="/admin_php/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 <script>
     $(document).ready(function() {
