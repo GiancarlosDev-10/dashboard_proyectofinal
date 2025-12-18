@@ -2,7 +2,6 @@
 session_start();
 include 'includes/header.php'; ?>
 
-
 <!-- WRAPPER PRINCIPAL -->
 <div id="wrapper">
 
