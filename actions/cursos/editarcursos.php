@@ -1,11 +1,11 @@
 <?php
 
-/**
- * EDITAR CURSO
- * Con validaciones server-side completas y respuesta JSON para AJAX
- */
-
+session_start();
+require '../../includes/csrf.php';
 include("../../db.php");
+
+// VALIDAR CSRF PRIMERO
+verificar_csrf_o_morir();
 
 // Configurar respuesta JSON
 header('Content-Type: application/json');

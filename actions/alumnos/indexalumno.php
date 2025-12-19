@@ -720,7 +720,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                             url: 'deletealumno.php',
                             type: 'POST',
                             data: {
-                                id: id
+                                id: id,
+                                csrf_token: $('input[name="csrf_token"]').val(),
                             },
                             dataType: 'json',
                             success: function(response) {

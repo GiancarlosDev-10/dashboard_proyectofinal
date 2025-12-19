@@ -170,6 +170,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 </div>
 
                 <form id="formEditarCurso">
+                    <?= csrf_input() ?>
+
                     <input type="hidden" name="id" id="edit-id">
 
                     <div class="mb-3">
@@ -262,6 +264,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 </div>
 
                 <form id="formAgregarCurso">
+                    <?= csrf_input() ?>
 
                     <div class="mb-3">
                         <label>Nombre del curso</label>
@@ -382,6 +385,7 @@ include(__DIR__ . '/../../includes/header.php'); ?>
     }
 </style>
 
+<?php include(__DIR__ . '/../../includes/footer.php'); ?>
 <script>
     $(document).ready(function() {
 
@@ -426,7 +430,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 fecha_inicio: $('#fecha_inicio').val(),
                 cupos: $('#cupos').val(),
                 precio: $('#precio').val(),
-                estado: $('#estado').val()
+                estado: $('#estado').val(),
+                csrf_token: $('input[name="csrf_token"]').val()
             };
 
             $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Registrando...');
@@ -484,7 +489,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 fecha_inicio: $('#edit-fecha_inicio').val(),
                 cupos: $('#edit-cupos').val(),
                 precio: $('#edit-precio').val(),
-                estado: $('#edit-estado').val()
+                estado: $('#edit-estado').val(),
+                csrf_token: $('input[name="csrf_token"]').val()
             };
 
             $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
@@ -527,7 +533,8 @@ include(__DIR__ . '/../../includes/header.php'); ?>
                 url: 'deletecursos.php',
                 type: 'POST',
                 data: {
-                    id
+                    id,
+                    csrf_token: $('input[name="csrf_token"]').val()
                 },
                 dataType: 'json',
                 success: function(resp) {
@@ -572,5 +579,3 @@ include(__DIR__ . '/../../includes/header.php'); ?>
 
     });
 </script>
-
-<?php include(__DIR__ . '/../../includes/footer.php'); ?>

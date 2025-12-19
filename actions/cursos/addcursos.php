@@ -4,8 +4,12 @@
  * AGREGAR CURSO
  * Validaciones server-side + respuesta JSON (AJAX)
  */
-
+session_start();
+require '../../includes/csrf.php';
 include("../../db.php");
+
+// VALIDAR CSRF PRIMERO
+verificar_csrf_o_morir();
 
 header('Content-Type: application/json');
 

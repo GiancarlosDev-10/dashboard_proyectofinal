@@ -5,7 +5,12 @@
  * Con validaciones completas, verificación de relaciones y respuesta JSON
  */
 
+session_start();
+require '../../includes/csrf.php';
 include("../../db.php");
+
+// VALIDAR CSRF PRIMERO
+verificar_csrf_o_morir();
 
 // Respuesta JSON
 header('Content-Type: application/json');
@@ -67,9 +72,8 @@ try {
     // ==============================
     // 2️⃣ VERIFICAR RELACIONES
     // ==============================
-    // Ejemplo si docente está asociado a cursos o matrículas
+    // Verificar si el docente tiene cursos asignados
 
-    /*
     $stmt_rel = $conn->prepare(
         "SELECT COUNT(*) AS total
          FROM curso
@@ -86,7 +90,6 @@ try {
         echo json_encode($response);
         exit;
     }
-    */
 
     // ==============================
     // 3️⃣ ELIMINAR DOCENTE
@@ -99,7 +102,7 @@ try {
     if ($stmt_delete->affected_rows > 0) {
 
         error_log(
-            "DOCENTE ELIMINADO - ID: {$docente['id']} - Nombre: {$docente['nombre']} - DNI: {$docente['dni']}"
+            "DOCENTE ELIMINADO - ID: {$docente['id']} - Nombre: {$docente['nombre']} - DNI: {$docente['dni']} - Especialidad: {$docente['especialidad']}"
         );
 
         $response['success'] = true;
@@ -118,7 +121,7 @@ try {
         strpos($e->getMessage(), 'foreign key constraint') !== false ||
         strpos($e->getMessage(), 'FOREIGN KEY') !== false
     ) {
-        $response['message'] = "No se puede eliminar. El docente tiene registros relacionados.";
+        $response['message'] = "No se puede eliminar. El docente tiene registros relacionados (cursos asignados).";
     } else {
         $response['message'] = "Error del sistema. No se pudo eliminar el docente.";
     }

@@ -5,7 +5,12 @@
  * Validaciones server-side completas y respuesta JSON para AJAX
  */
 
+session_start();
+require '../../includes/csrf.php';
 include("../../db.php");
+
+// VALIDAR CSRF PRIMERO
+verificar_csrf_o_morir();
 
 // Respuesta JSON
 header('Content-Type: application/json');
@@ -20,8 +25,8 @@ $response = [
 // SANITIZAR Y OBTENER DATOS
 // ==============================
 
-$alumno_id         = trim($_POST['alumno_id'] ?? '');
-$curso_id          = trim($_POST['curso_id'] ?? '');
+$alumno_id         = intval($_POST['alumno_id'] ?? 0);
+$curso_id          = intval($_POST['curso_id'] ?? 0);
 $fecha_inscripcion = trim($_POST['fecha_inscripcion'] ?? '');
 $estado            = trim($_POST['estado'] ?? 'Matriculado');
 
@@ -30,12 +35,12 @@ $estado            = trim($_POST['estado'] ?? 'Matriculado');
 // ==============================
 
 // Alumno
-if ($alumno_id === '' || !ctype_digit($alumno_id)) {
+if ($alumno_id <= 0) {
     $response['errors']['alumno_id'] = "Debe seleccionar un alumno válido.";
 }
 
 // Curso
-if ($curso_id === '' || !ctype_digit($curso_id)) {
+if ($curso_id <= 0) {
     $response['errors']['curso_id'] = "Debe seleccionar un curso válido.";
 }
 

@@ -1,12 +1,12 @@
 <?php
-
-/**
- * ELIMINAR CURSO
- * Con validaciones completas, verificación de relaciones y respuesta JSON
- */
-
+session_start();
+require '../../includes/csrf.php';
 include("../../db.php");
 
+// VALIDAR CSRF PRIMERO
+verificar_csrf_o_morir();
+
+// Configurar respuesta JSON
 header('Content-Type: application/json');
 
 $response = [

@@ -198,6 +198,8 @@ include(__DIR__ . '/../../includes/header.php');
 <!-- SCRIPTS -->
 <!-- ========================================================= -->
 
+<?php include(__DIR__ . '/../../includes/footer.php'); ?>
+
 <script>
     // Buscador en tiempo real
     document.getElementById('busqueda').addEventListener('input', function() {
@@ -247,5 +249,3 @@ include(__DIR__ . '/../../includes/header.php');
         });
     });
 </script>
-
-<?php include(__DIR__ . '/../../includes/footer.php'); ?>
