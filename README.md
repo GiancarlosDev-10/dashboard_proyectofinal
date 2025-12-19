@@ -450,29 +450,9 @@ http://localhost/admin_php/
 
 ---
 
-## 📸 Capturas de Pantalla
-
-### Dashboard Principal
-
-![Dashboard](docs/screenshots/dashboard.png)
-
-### Gestión de Alumnos
-
-![Alumnos](docs/screenshots/alumnos.png)
-
-### Generador de Tickets
-
-![Tickets](docs/screenshots/tickets.png)
-
-### Perfil con Foto
-
-![Perfil](docs/screenshots/perfil.png)
-
----
-
 ## 👨‍💻 Autor
 
-**Giancarlos**  
+**Giancarlos Ormeño**  
 Proyecto Final – Desarrollo de Soluciones Web Back-End  
 I.E.S.T.P "Gilda Liliana Ballivián Rosado"  
 🇵🇪 Perú - 2025
@@ -486,22 +466,13 @@ Desarrollado como proyecto final para la asignatura de Desarrollo Web Back-End.
 
 ---
 
-## 🙏 Agradecimientos
-
-- Instituto Gilda Ballivián por la formación académica
-- Profesor Benjamín Huanca por la guía y requisitos del proyecto
-- SB Admin 2 por el template administrativo
-- FPDF por la librería de generación de PDFs
-- Chart.js por los gráficos dinámicos
-
----
 
 ## 📞 Contacto
 
 Para consultas sobre este proyecto:
 
-- **Email:** giancarlos@cersa.com
-- **GitHub:** [tu-usuario](https://github.com/tu-usuario)
+- **Email:** giangio237@gmail.com
+- **GitHub:** https://github.com/GiancarlosDev-10
 
 ---
 
